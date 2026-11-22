@@ -9,7 +9,7 @@ Dokument referencyjny dla agentów AI/LLM opisujący strukturę, przepływ danyc
 `myco-app` to mobilna aplikacja mykologiczna dla Polski (język UI: polski), łącząca identyfikację grzybów opartą na bezpieczeństwie toksykologicznym z prognozowaniem wysypu owocników na podstawie pogody.
 
 - **Tryb działania (offline-first + wybiórcze online):**
-  - **Offline:** Cała baza gatunków (`146` gatunków w `src/data/species/` skompilowana do `assets/db/myco.db`), silnik klucza oznaczania (`Quiz`), Bramka Bezpieczeństwa, wyszukiwanie/filtrowanie w Atlasie, zapisane stany filtrów/prognoz w `AsyncStorage` oraz ostatnio pobrane zrzuty pogody działają w pełni bez sieci.
+  - **Offline:** Cała baza gatunków (`159` gatunków w `src/data/species/` skompilowana do `assets/db/myco.db`), silnik klucza oznaczania (`Quiz`), Bramka Bezpieczeństwa, wyszukiwanie/filtrowanie w Atlasie, zapisane stany filtrów/prognoz w `AsyncStorage` oraz ostatnio pobrane zrzuty pogody działają w pełni bez sieci.
   - **Online:** Pobieranie historii i bieżących danych pogodowych (Open-Meteo Forecast API), wyszukiwanie miejscowości po nazwie (Open-Meteo Geocoding API, `countryCode=PL`) oraz kafelki/skrypt mapy w `WebView` (OpenStreetMap + Leaflet CDN z SRI).
 - **Główne moduły biznesowe:**
   1. **Predyktor wysypu (`src/features/predictor/`):** Oblicza heurystyczny indeks wysypu (`0–100`), poziom (`FlushLevel`), pewność (`PredictionConfidence`), czynniki składowe (`PredictionFactor[]`) oraz ranking gatunków pasujących do okna opadów/temperatury/sezonu dla lokalizacji GPS urządzenia, miejsca tymczasowego (`custom`) i maks. `20` zapisanych miejsc (`SavedPlace`).
@@ -53,7 +53,7 @@ Dokument referencyjny dla agentów AI/LLM opisujący strukturę, przepływ danyc
 ```text
 myco-app/
 ├── app/                                # Definicje tras Expo Router (cienkie wrappery eksportujące ekrany z src/features/)
-│   ├── _layout.tsx                     # Root Stack + bramka inicjalizacji SQLite (initDatabase())
+│   ├── _layout.tsx                     # Root Stack, <StatusBar style="dark" /> + bramka inicjalizacji SQLite (initDatabase() z ponowieniem)
 │   ├── (tabs)/
 │   │   ├── _layout.tsx                 # Nawigator dolnych zakładek: Wysyp, Atlas, Klucz
 │   │   ├── index.tsx                   # Zakładka startowa „Wysyp” -> PredictorScreen
@@ -82,9 +82,9 @@ myco-app/
     │   ├── icons/Icon.tsx              # Abstrakcja ikon (@expo/vector-icons)
     │   └── ui/                         # Prymitywy: AnimatedBar, FieldError, PressableScale, SegmentedControl, StatusBanner, SurfaceCard
     ├── data/                           # Statyczna baza wiedzy w TS (źródło prawdy dla build:db i testów)
-    │   ├── index.ts                    # Składa MUSHROOM_DB (schemaVersion, dataVersion='2026.11.4', species) + getMushroomById
+    │   ├── index.ts                    # Składa MUSHROOM_DB (schemaVersion, dataVersion='2026.11.22', species) + getMushroomById
     │   ├── __tests__/database.test.ts  # Test uruchamiający validateDatabase(MUSHROOM_DB) === []
-    │   └── species/                    # 146 plików gatunków (<kebab-id>.ts) + generowany index.ts (ALL_SPECIES)
+    │   └── species/                    # 159 plików gatunków (<kebab-id>.ts) + generowany index.ts (ALL_SPECIES)
     ├── db/                             # Warstwa runtime SQLite (expo-sqlite)
     │   ├── schema.ts                   # DB_NAME, DB_SCHEMA_VERSION, DB_DATA_VERSION, MORPHOLOGY_COLUMNS, SQL DDL, normalizacja FTS
     │   ├── client.ts                   # initDatabase() (kopiuje assets/db/myco.db przy niezgodności version_tag) i getDb()
@@ -107,8 +107,6 @@ myco-app/
     │   ├── predictor/                  # PredictorScreen, ForecastDetailsScreen, predictFlush, weatherMetrics, weatherFilter, predictionCache, store/*, components/*
     │   ├── quiz/                       # QuizScreen, copy.pl, engine/{quizEngine, quizState, similarity, nearValues}, ui/* (QuestionView, ResultsView, GateBanner, resultRows, itp.)
     │   └── species/                    # SpeciesDetailsScreen + components/{FeatureGroupsCard, LookalikesCard, SeasonStrip}
-    ├── hooks/
-    │   └── useDarkStatusBar.ts         # Przełącza styl paska stanu na 'dark' w Atlasie i Kluczu
     ├── i18n/
     │   ├── pl.ts                       # Etykiety PL wymuszane przez Record<Union, string>
     │   └── featureValues.pl.ts         # Etykiety PL dla wszystkich wartości z FEATURE_VOCABULARIES
@@ -167,7 +165,7 @@ myco-app/
   - `predictFlush` (`FLUSH_MODEL_VERSION = 'heuristic-1'`):
     - Indeks globalny `0–100`: średnia ważona wkładów w `[-1, 1]` dla `precipitation` (0.40, okno 10 dni, neutral 20 mm), `temperature` (0.25, okno 7 dni, opt 10–20 °C), `season` (0.20, udział gatunków owocnikujących w `targetMonth` względem `totalSpeciesCount`) i `soil_moisture` (0.15, okno 3 dni, neutral 0.25), skalowana przez karę przymrozkową `frost` (okno 5 dni, `tempMinC < 0`).
     - Ocena gatunków (`rankCandidates`): filtruje po miesiącu, łączy opady z okna `[lagMin, lagMax]` dni wstecz (`daysInAgeWindow`, waga 0.6) i temperaturę z 7 dni (waga 0.4), z mnożnikiem `0.2` przy przymrozku w ostatnich 3 dniach dla `frostSensitive`.
-  - Wyniki na listach są memoizowane per obiekt `WeatherSnapshot` w `WeakMap` (`predictionCache.ts`) oraz używane przez `useWeatherFilter` (`FAVORABLE_WEATHER_MIN_SCORE = 50`) do filtrowania w Atlasie i wynikach Quizu.
+  - Wyniki na listach są memoizowane per obiekt `WeatherSnapshot` w `WeakMap` z TTL 15 min i unieważnieniem na progach pewności (`predictionCache.ts`) oraz używane przez `useWeatherFilter` (`FAVORABLE_WEATHER_MIN_SCORE = 50`) do filtrowania w Atlasie i wynikach Quizu.
 
 ---
 
@@ -202,9 +200,7 @@ Routing opiera się na Expo Router w katalogu **`app/`**:
 6. **Specyfika zapytań zewnętrznych i `WebView`:**
    - `MapPicker` ładuje kafelki OpenStreetMap i wymaga niestandardowego `APP_USER_AGENT` (`src/appInfo.ts`); domyślny User-Agent `WebView` jest blokowany przez serwery OSM. Skrypt Leaflet ma przypięte hashe SRI w `src/features/location/map/mapPage.ts`.
    - `openMeteo.ts` używa `/v1/forecast?past_days=...&forecast_days=1` zamiast Archive API (ERA5 ma opóźnienie kilku dni) i celowo nie używa zmiennej dobowej `temperature_2m_mean` (agreguje `temperature_2m` z danych godzinowych).
-7. **Known Gotcha w `AtlasScreen.tsx` (`queryParams`):**
-   - W `src/features/atlas/AtlasScreen.tsx` (linie 37–48) hook `useMemo` dla `queryParams` używa `state.filters.favorableWeather`, `weather.available` oraz `weather.favorableIds`, ale tablica zależności `useMemo` pomija te trzy pola — przy modyfikacji filtrowania pogodowego w Atlasie należy zaktualizować zależności `useMemo`.
-8. **Presety animacji Reanimated (`src/components/motion.ts`) i i18n (`src/i18n/`):**
+7. **Presety animacji Reanimated (`src/components/motion.ts`) i i18n (`src/i18n/`):**
    - Builderów animacji eksportowanych jako stałe (`APPEAR`, `RISE`, itp.) nie wolno mutować przez `.delay()` bezpośrednio — należy tworzyć nowe instancje jak w `staggeredList` / `staggeredRise`.
    - Mapy etykiet w `src/i18n/pl.ts` i `src/i18n/featureValues.pl.ts` używają `Record<TypUnii, string>` — dodanie wartości do słownika w `src/domain/vocabulary/` wymusi jej przetłumaczenie błędem kompilacji `tsc --noEmit`.
-9. **Testy i weryfikacja:** Po zmianach w logice, typach lub danych należy uruchomić `npm run typecheck` oraz `npm test` (obejmujące m.in. `realDatabase.test.ts`, `realDatabase.quiz.test.ts` i `database.test.ts` testujące całą 146-gatunkową bazę).
+8. **Testy i weryfikacja:** Po zmianach w logice, typach lub danych należy uruchomić `npm run typecheck` oraz `npm test` (obejmujące m.in. `realDatabase.test.ts`, `realDatabase.quiz.test.ts` i `database.test.ts` testujące całą 159-gatunkową bazę).
