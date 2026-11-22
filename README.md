@@ -85,6 +85,11 @@ npm test
 npm run typecheck
 ```
 
+## Platforma docelowa i środowisko testowe
+
+- **System docelowy:** Aplikacja została przygotowana głównie z myślą o systemie **Android** (kod opiera się na React Native i Expo, więc zachowuje zgodność z iOS, jednak priorytetem był Android - m.in. konfiguracja `APP_USER_AGENT` dla WebView i obsługa uprawnień lokalizacji).
+- **Testy na fizycznym urządzeniu:** Aplikacja została przetestowana na fizycznym urządzeniu z systemem Android - Nothing Phone 2 z Android 16 przez Expo Go, w tym w warunkach terenowych (tryb offline, GPS, odczyt lokalnej bazy SQLite).
+
 ## Zastrzeżenie bezpieczeństwa
 
 Aplikacja ma charakter edukacyjny i wspomagający planowanie wyjść w teren. Lokalna baza nie obejmuje wszystkich gatunków występujących w Polsce, a indeks wysypu jest heurystyką pogodową. Nigdy nie spożywaj grzybów wyłącznie na podstawie wskazań aplikacji.
