@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "scheme": "myco",
     "ios": {
       "supportsTablet": true
     },
@@ -20,6 +21,19 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Myco potrzebuje Twojej lokalizacji, żeby pokazać miejsca w pobliżu."
+        }
+      ],
+      "expo-font",
+      "expo-status-bar",
+      "expo-sqlite",
+      "expo-asset"
+    ]
   }
 }

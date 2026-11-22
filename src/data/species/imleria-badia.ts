@@ -1,0 +1,61 @@
+/**
+ * @file Rekord gatunku: podgrzybek brunatny.
+ */
+import { mushroomId, type Mushroom } from '../../domain';
+
+export const imleriaBadia: Mushroom = {
+  id: mushroomId('imleria-badia'),
+  scientificName: 'Imleria badia',
+  scientificSynonyms: ['Boletus badius', 'Xerocomus badius'],
+  polishName: 'Podgrzybek brunatny',
+  vernacularNames: ['podgrzybek', 'czarny łebek'],
+  features: {
+    hymenophore: ['tubes'],
+    gillAttachment: ['not_applicable'],
+    capColor: ['brown', 'brown_dark', 'red_brown'], 
+    capShape: ['hemispherical', 'convex', 'flat'],
+    capSize: ['under_5', '5_to_10', '10_to_20'],
+    capSurface: ['velvety', 'smooth', 'slimy'], 
+    capMargin: ['smooth'],
+    capPeelability: ['none'],
+    hymenophoreColor: ['cream', 'yellow', 'olive'],
+    sporePrint: ['olive_brown'],
+    capFleshColor: ['white', 'yellow'], 
+    capFleshColorChange: ['blue', 'none'], 
+    bruising: ['blue'], 
+    latex: ['none'],
+    stipeShape: ['cylindrical', 'clavate'],
+    stipeInterior: ['solid'],
+    stipeSurface: ['fibrillose', 'smooth'], 
+    stipeColor: ['cream', 'brown_light', 'brown'],
+    stipeFleshColor: ['white', 'yellow'],
+    stipeFleshColorChange: ['none', 'blue'], 
+    volva: ['absent'],
+    stipeBase: ['plain'],
+    ring: ['none'],
+    growthHabit: ['solitary', 'scattered'],
+    smell: ['mushroomy'],
+    taste: ['mild'],
+  },
+  edibility: {
+    category: 'edible',
+    notes: 'Bardzo dobry grzyb jadalny o wysokich walorach kulinarnych. Wszechstronny w kuchni (smażenie, duszenie, suszenie, marynowanie); wymaga dokładnej obróbki termicznej.',
+  },
+  ecology: {
+    trophicModes: ['mycorrhizal'],
+    mycorrhizalPartners: ['pinus', 'picea', 'fagus', 'quercus', 'betula'],
+    substrates: ['soil', 'moss', 'wood_dead'], 
+    habitats: ['coniferous_forest', 'mixed_forest', 'deciduous_forest'],
+  },
+  fruiting: {
+    months: [7, 8, 9, 10, 11],
+    optimalMeanTempC: { min: 8, max: 18 },
+    minPrecipitationMm: 15,
+    lagDays: { min: 5, max: 10 },
+    frostSensitive: false,
+  },
+  dangerousLookalikes: [],
+  legallyProtected: false,
+  imageKeys: ['imleria-badia-1'],
+  description: 'Kapelusz kasztanowy, po deszczu lepki. Pory kremowe do oliwkowożółtych, po uciśnięciu sinozielone. Trzon bez siateczki, z brązowymi włókienkami. Jeden z najpospolitszych grzybów jadalnych, do późnej jesieni.',
+};

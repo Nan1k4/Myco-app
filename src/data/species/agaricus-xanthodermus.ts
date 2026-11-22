@@ -1,0 +1,63 @@
+/**
+ * @file Rekord gatunku: pieczarka karbolowa (Agaricus xanthodermus).
+ */
+import { mushroomId, type Mushroom } from '../../domain';
+
+export const agaricusXanthodermus: Mushroom = {
+  id: mushroomId('agaricus-xanthodermus'),
+  scientificName: 'Agaricus xanthodermus',
+  scientificSynonyms: ['Psalliota xanthoderma'],
+  polishName: 'Pieczarka karbolowa',
+  vernacularNames: ['none'],
+  features: {
+    hymenophore: ['gills'],
+    gillAttachment: ['free'],
+    capColor: ['white', 'cream', 'grey'],
+    capShape: ['hemispherical', 'convex', 'flat'],
+    capSize: ['under_5', '5_to_10', '10_to_20'],
+    capSurface: ['smooth', 'cracked'],
+    capMargin: ['smooth', 'inrolled', 'appendiculate'],
+    capPeelability: ['full'],
+    hymenophoreColor: ['white', 'pink', 'brown', 'brown_dark'],
+    sporePrint: ['purple_brown'],
+    capFleshColor: ['white'],
+    capFleshColorChange: ['none', 'yellow'],
+    bruising: ['yellow'],
+    latex: ['none'],
+    stipeShape: ['cylindrical'],
+    stipeInterior: ['hollow', 'stuffed'],
+    stipeSurface: ['smooth'],
+    stipeColor: ['white'],
+    stipeFleshColor: ['white'],
+    stipeFleshColorChange: ['yellow'],
+    volva: ['absent'],
+    stipeBase: ['rounded_bulb'],
+    ring: ['membranous_skirt', 'none'],
+    growthHabit: ['solitary', 'scattered', 'clustered'],
+    smell: ['phenol'],
+    taste: ['mild'],
+  },
+  edibility: {
+    category: 'poisonous',
+    syndromes: ['gastrointestinal'],
+    symptomOnsetHours: { min: 0.5, max: 3 },
+    notes: 'Wywołuje wymioty i biegunkę. Część osób nie ma objawów, co nie świadczy o bezpieczeństwie.',
+  },
+  ecology: {
+    trophicModes: ['saprotrophic'],
+    mycorrhizalPartners: [],
+    substrates: ['soil', 'litter'],
+    habitats: ['park', 'meadow', 'deciduous_forest'],
+  },
+  fruiting: {
+    months: [7, 8, 9, 10],
+    optimalMeanTempC: { min: 14, max: 22 },
+    minPrecipitationMm: 15,
+    lagDays: { min: 4, max: 10 },
+    frostSensitive: true,
+  },
+  dangerousLookalikes: [],
+  legallyProtected: false,
+  imageKeys: ['agaricus-xanthodermus-1'],
+  description: 'Podstawa trzonu po przekrojeniu natychmiast chromowożółta, zapach karbolu (atramentu, szpitala).',
+};

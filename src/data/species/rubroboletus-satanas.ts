@@ -1,0 +1,63 @@
+/**
+ * @file Rekord gatunku: krwistoborowik szatański (borowik szatański).
+ */
+import { mushroomId, type Mushroom } from '../../domain';
+
+export const rubroboletusSatanas: Mushroom = {
+  id: mushroomId('rubroboletus-satanas'),
+  scientificName: 'Rubroboletus satanas',
+  scientificSynonyms: ['Boletus satanas'],
+  polishName: 'Krwistoborowik szatański',
+  vernacularNames: ['borowik szatański', 'szatan'],
+  features: {
+    hymenophore: ['tubes'],
+    gillAttachment: ['not_applicable'], 
+    capColor: ['white', 'grey', 'cream', 'olive'], 
+    capShape: ['hemispherical', 'convex', 'flat'],
+    capSize: ['5_to_10', '10_to_20', 'over_20'],
+    capSurface: ['velvety', 'smooth'],
+    capMargin: ['smooth', 'inrolled'],
+    capPeelability: ['none'],
+    hymenophoreColor: ['yellow', 'orange', 'red'], 
+    sporePrint: ['olive_brown'],
+    capFleshColor: ['white', 'cream'], 
+    capFleshColorChange: ['blue', 'none'], 
+    bruising: ['blue'],
+    latex: ['none'],
+    stipeShape: ['ventricose', 'clavate'], 
+    stipeInterior: ['solid'],
+    stipeSurface: ['reticulate'], 
+    stipeColor: ['yellow', 'red', 'pink'], 
+    stipeFleshColor: ['cream', 'yellow', 'red'], 
+    stipeFleshColorChange: ['blue', 'none'],
+    volva: ['absent'],
+    stipeBase: ['plain'],
+    ring: ['none'],
+    growthHabit: ['solitary', 'scattered'],
+    smell: ['none', 'unpleasant'], 
+    taste: ['mild'], 
+  },
+  edibility: {
+    category: 'poisonous',
+    syndromes: ['gastrointestinal'],
+    symptomOnsetHours: { min: 0.5, max: 6 },
+    notes: 'Silne, długotrwałe wymioty. Ściśle chroniony - zbiór zabroniony.',
+  },
+  ecology: {
+    trophicModes: ['mycorrhizal'],
+    mycorrhizalPartners: ['quercus', 'fagus', 'carpinus', 'tilia'],
+    substrates: ['soil'], 
+    habitats: ['deciduous_forest'],
+  },
+  fruiting: {
+    months: [7, 8, 9],
+    optimalMeanTempC: { min: 16, max: 24 },
+    minPrecipitationMm: 20,
+    lagDays: { min: 6, max: 12 },
+    frostSensitive: true,
+  },
+  dangerousLookalikes: [],
+  legallyProtected: true,
+  imageKeys: ['rubroboletus-satanas-1'],
+  description: 'Kapelusz białawy do szarawego, pory czerwone, trzon brzuchaty, żółto-czerwony z czerwoną siateczką. Miąższ sinieje słabo. Stare owocniki cuchną padliną. Silnie trujący (ciężkie wymioty) i ściśle chroniony - w Polsce znany z nielicznych stanowisk.',
+};

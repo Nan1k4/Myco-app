@@ -1,0 +1,61 @@
+/**
+ * @file Rekord gatunku: borowik sosnowy (Boletus pinophilus).
+ */
+import { mushroomId, type Mushroom } from '../../domain';
+
+export const boletusPinophilus: Mushroom = {
+  id: mushroomId('boletus-pinophilus'),
+  scientificName: 'Boletus pinophilus',
+  scientificSynonyms: ['Boletus pinicola'],
+  polishName: 'Borowik sosnowy',
+  vernacularNames: ['prawdziwek sosnowy'],
+  features: {
+    hymenophore: ['tubes'],
+    gillAttachment: ['not_applicable'], 
+    capColor: ['red_brown', 'brown', 'brown_dark'], 
+    capShape: ['hemispherical', 'convex', 'flat'],
+    capSize: ['5_to_10', '10_to_20', 'over_20'],
+    capSurface: ['smooth', 'velvety'],
+    capMargin: ['smooth'],
+    capPeelability: ['none'],
+    hymenophoreColor: ['white', 'cream', 'yellow', 'olive'],
+    sporePrint: ['olive_brown'],
+    capFleshColor: ['white'], 
+    capFleshColorChange: ['none'],
+    bruising: ['none'],
+    latex: ['none'],
+    stipeShape: ['clavate'],
+    stipeInterior: ['solid'],
+    stipeSurface: ['reticulate'], 
+    stipeColor: ['cream', 'brown_light', 'red_brown'],
+    stipeFleshColor: ['white'],
+    stipeFleshColorChange: ['none'],
+    volva: ['absent'],
+    stipeBase: ['plain'],
+    ring: ['none'],
+    growthHabit: ['solitary', 'scattered'],
+    smell: ['mushroomy'],
+    taste: ['mild', 'nutty'],
+  },
+  edibility: {
+    category: 'edible',
+    notes: 'Wybitny grzyb jadalny. W Polsce gatunek rzadki (kategoria R na Czerwonej Liście). Tworzy mikoryzę głównie z sosną.',
+  },
+  ecology: {
+    trophicModes: ['mycorrhizal'],
+    mycorrhizalPartners: ['pinus', 'picea'],
+    substrates: ['soil', 'moss'],
+    habitats: ['coniferous_forest', 'mixed_forest'],
+  },
+  fruiting: {
+    months: [6, 7, 8, 9, 10],
+    optimalMeanTempC: { min: 12, max: 20 },
+    minPrecipitationMm: 25,
+    lagDays: { min: 7, max: 14 },
+    frostSensitive: true,
+  },
+  dangerousLookalikes: [], 
+  legallyProtected: false,
+  imageKeys: ['boletus-pinophilus-1'],
+  description: 'Pod sosnami, często w mchu i na wrzosowiskach. Kapelusz czerwonobrązowy, trzon masywny z czerwonawobrązową siateczką. Miąższ nie sinieje. Mylony z goryczakiem (różowe rurki, ciemna siateczka, gorzki).',
+};

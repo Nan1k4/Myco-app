@@ -1,0 +1,62 @@
+/**
+ * @file Rekord gatunku: gorzkoborowik korzeniasty (borowik korzeniasty).
+ */
+import { mushroomId, type Mushroom } from '../../domain';
+
+export const caloboletusRadicans: Mushroom = {
+  id: mushroomId('caloboletus-radicans'),
+  scientificName: 'Caloboletus radicans',
+  scientificSynonyms: ['Boletus radicans', 'Boletus albidus'],
+  polishName: 'Gorzkoborowik korzeniasty',
+  vernacularNames: ['borowik korzeniasty'],
+  features: {
+    hymenophore: ['tubes'],
+    gillAttachment: ['not_applicable'], 
+    capColor: ['white', 'grey', 'cream'],
+    capShape: ['hemispherical', 'convex', 'flat'],
+    capSize: ['5_to_10', '10_to_20', 'over_20'],
+    capSurface: ['velvety', 'cracked'],
+    capMargin: ['smooth', 'inrolled'],
+    capPeelability: ['none'],
+    hymenophoreColor: ['yellow', 'olive'], 
+    sporePrint: ['olive_brown'],
+    capFleshColor: ['white', 'cream', 'yellow'],
+    capFleshColorChange: ['blue'],
+    bruising: ['blue'],
+    latex: ['none'],
+    stipeShape: ['clavate', 'ventricose'],
+    stipeInterior: ['solid'],
+    stipeSurface: ['reticulate'], 
+    stipeColor: ['yellow', 'cream'], 
+    stipeFleshColor: ['cream', 'yellow'],
+    stipeFleshColorChange: ['blue'],
+    volva: ['absent'],
+    stipeBase: ['rooting'],
+    ring: ['none'],
+    growthHabit: ['solitary', 'scattered'],
+    smell: ['none'],
+    taste: ['bitter'],
+  },
+  edibility: {
+    category: 'inedible',
+    reasons: ['unpleasant_taste', 'minor_toxins'],
+    notes: 'Bardzo gorzki. Ściśle chroniony - zbiór zabroniony.',
+  },
+  ecology: {
+    trophicModes: ['mycorrhizal'],
+    mycorrhizalPartners: ['quercus', 'fagus', 'tilia', 'carpinus'],
+    substrates: ['soil'],
+    habitats: ['deciduous_forest', 'park'],
+  },
+  fruiting: {
+    months: [7, 8, 9],
+    optimalMeanTempC: { min: 16, max: 24 },
+    minPrecipitationMm: 20,
+    lagDays: { min: 6, max: 12 },
+    frostSensitive: true,
+  },
+  dangerousLookalikes: [],
+  legallyProtected: true,
+  imageKeys: ['caloboletus-radicans-1'],
+  description: 'Kapelusz białawy do szarawego, często spękany; pory cytrynowożółte, sinieją. Trzon żółty bez czerwieni, z jasną siateczką, zwężony w korzeniastą podstawę. Bardzo gorzki. Ściśle chroniony - mylony z borowikiem usiatkowanym.',
+};

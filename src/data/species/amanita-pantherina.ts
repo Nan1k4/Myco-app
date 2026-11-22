@@ -1,0 +1,63 @@
+/**
+ * @file Rekord gatunku: muchomor plamisty (Amanita pantherina).
+ */
+import { mushroomId, type Mushroom } from '../../domain';
+
+export const amanitaPantherina: Mushroom = {
+  id: mushroomId('amanita-pantherina'),
+  scientificName: 'Amanita pantherina',
+  scientificSynonyms: ['Agaricus pantherinus'],
+  polishName: 'Muchomor plamisty',
+  vernacularNames: ['muchomor pantera'],
+  features: {
+    hymenophore: ['gills'],
+    gillAttachment: ['free'],
+    capColor: ['brown_light', 'brown', 'olive'],
+    capShape: ['hemispherical', 'convex', 'flat'],
+    capSize: ['under_5', '5_to_10', '10_to_20'],
+    capSurface: ['warts', 'smooth', 'slimy'],
+    capMargin: ['striate', 'smooth', 'inrolled', 'appendiculate'],
+    capPeelability: ['full'],
+    hymenophoreColor: ['white'],
+    sporePrint: ['white'],
+    capFleshColor: ['white'],
+    capFleshColorChange: ['none'],
+    bruising: ['none'],
+    latex: ['none'],
+    stipeShape: ['cylindrical'],
+    stipeInterior: ['stuffed', 'hollow'],
+    stipeSurface: ['smooth', 'fibrillose'],
+    stipeColor: ['white'],
+    stipeFleshColor: ['white'],
+    stipeFleshColorChange: ['none'],
+    volva: ['present'],
+    stipeBase: ['marginate_bulb'],
+    ring: ['membranous_skirt', 'none'],
+    growthHabit: ['solitary', 'scattered', 'clustered'],
+    smell: ['none', 'radish'],
+    taste: ['mild'],
+  },
+  edibility: {
+    category: 'poisonous',
+    syndromes: ['isoxazole'],
+    symptomOnsetHours: { min: 0.5, max: 3 },
+    notes: 'Silniej trujący niż muchomor czerwony. Zespół pantherinowy: pobudzenie, splątanie, drgawki, śpiączka.',
+  },
+  ecology: {
+    trophicModes: ['mycorrhizal'],
+    mycorrhizalPartners: ['quercus', 'fagus', 'pinus', 'picea'],
+    substrates: ['soil'],
+    habitats: ['deciduous_forest', 'mixed_forest', 'coniferous_forest'],
+  },
+  fruiting: {
+    months: [6, 7, 8, 9, 10],
+    optimalMeanTempC: { min: 13, max: 22 },
+    minPrecipitationMm: 15,
+    lagDays: { min: 5, max: 12 },
+    frostSensitive: true,
+  },
+  dangerousLookalikes: [],
+  legallyProtected: false,
+  imageKeys: ['amanita-pantherina-1'],
+  description: 'Brązowy kapelusz z białymi łatkami, bulwa z wyraźnym obrzeżeniem. Mylony z młodą kanią i muchomorem czerwieniejącym.',
+};

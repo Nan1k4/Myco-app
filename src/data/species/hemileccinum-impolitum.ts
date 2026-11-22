@@ -1,0 +1,61 @@
+/**
+ * @file Rekord gatunku: borowik płowy.
+ */
+import { mushroomId, type Mushroom } from '../../domain';
+
+export const hemileccinumImpolitum: Mushroom = {
+  id: mushroomId('hemileccinum-impolitum'),
+  scientificName: 'Hemileccinum impolitum',
+  scientificSynonyms: ['Boletus impolitus', 'Xerocomus impolitus', 'Boletus suspectus'],
+  polishName: 'Borowik płowy',
+  vernacularNames: [],
+  features: {
+    hymenophore: ['tubes'],
+    gillAttachment: ['not_applicable'],
+    capColor: ['brown_light', 'olive', 'cream'], 
+    capShape: ['hemispherical', 'convex', 'flat'],
+    capSize: ['5_to_10', '10_to_20'],
+    capSurface: ['velvety', 'smooth'], 
+    capMargin: ['smooth'],
+    capPeelability: ['none'],
+    hymenophoreColor: ['yellow', 'olive'],
+    sporePrint: ['olive_brown'],
+    capFleshColor: ['yellow', 'cream'], 
+    capFleshColorChange: ['none', 'blue'], 
+    bruising: ['none'],
+    latex: ['none'],
+    stipeShape: ['cylindrical', 'clavate'],
+    stipeInterior: ['solid'],
+    stipeSurface: ['smooth', 'punctate'], 
+    stipeColor: ['yellow', 'cream'],
+    stipeFleshColor: ['yellow', 'brown'],
+    stipeFleshColorChange: ['none', 'pink'],
+    volva: ['absent'],
+    stipeBase: ['plain'],
+    ring: ['none'],
+    growthHabit: ['solitary', 'scattered'],
+    smell: ['iodine'],
+    taste: ['mild'],
+  },
+  edibility: {
+    category: 'edible',
+    notes: 'Jadalny, ale rzadki - lepiej go nie zbierać.',
+  },
+  ecology: {
+    trophicModes: ['mycorrhizal'],
+    mycorrhizalPartners: ['quercus', 'fagus', 'castanea'],
+    substrates: ['soil'],
+    habitats: ['deciduous_forest', 'park'],
+  },
+  fruiting: {
+    months: [6, 7, 8, 9, 10],
+    optimalMeanTempC: { min: 15, max: 23 },
+    minPrecipitationMm: 20,
+    lagDays: { min: 6, max: 12 },
+    frostSensitive: true,
+  },
+  dangerousLookalikes: [],
+  legallyProtected: false,
+  imageKeys: ['hemileccinum-impolitum-1'],
+  description: 'Kapelusz gliniastobrązowy do oliwkowoochrowego, pory żółte, nie sinieją. Trzon bez siateczki, drobno kosmkowaty. Podstawa trzonu pachnie jodoformem. Pod dębami na glebach wapiennych; rzadki - lepiej zostawić.',
+};

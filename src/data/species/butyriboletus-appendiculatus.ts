@@ -1,0 +1,61 @@
+/**
+ * @file Rekord gatunku: masłoborowik żółtobrązowy (borowik żółtobrązowy).
+ */
+import { mushroomId, type Mushroom } from '../../domain';
+
+export const butyriboletusAppendiculatus: Mushroom = {
+  id: mushroomId('butyriboletus-appendiculatus'),
+  scientificName: 'Butyriboletus appendiculatus',
+  scientificSynonyms: ['Boletus appendiculatus'],
+  polishName: 'Masłoborowik żółtobrązowy',
+  vernacularNames: ['borowik żółtobrązowy'],
+  features: {
+    hymenophore: ['tubes'],
+    gillAttachment: ['not_applicable'], 
+    capColor: ['brown_light', 'brown', 'red_brown'], 
+    capShape: ['hemispherical', 'convex', 'flat'],
+    capSize: ['5_to_10', '10_to_20'],
+    capSurface: ['velvety', 'cracked'],
+    capMargin: ['smooth'],
+    capPeelability: ['none'],
+    hymenophoreColor: ['yellow', 'olive'],
+    sporePrint: ['olive_brown'],
+    capFleshColor: ['yellow'],
+    capFleshColorChange: ['blue'],
+    bruising: ['blue'],
+    latex: ['none'],
+    stipeShape: ['clavate', 'cylindrical'],
+    stipeInterior: ['solid'],
+    stipeSurface: ['reticulate'],
+    stipeColor: ['yellow'],
+    stipeFleshColor: ['yellow', 'brown'],
+    stipeFleshColorChange: ['blue'],
+    volva: ['absent'],
+    stipeBase: ['rooting'],
+    ring: ['none'],
+    growthHabit: ['solitary', 'scattered'],
+    smell: ['mushroomy', 'none'],
+    taste: ['mild', 'nutty'],
+  },
+  edibility: {
+    category: 'edible',
+    notes: 'Rzadki - lepiej go nie zbierać.',
+  },
+  ecology: {
+    trophicModes: ['mycorrhizal'],
+    mycorrhizalPartners: ['quercus', 'fagus', 'carpinus', 'abies', 'picea'],
+    substrates: ['soil'],
+    habitats: ['deciduous_forest', 'mixed_forest'],
+  },
+  fruiting: {
+    months: [6, 7, 8, 9],
+    optimalMeanTempC: { min: 15, max: 23 },
+    minPrecipitationMm: 20,
+    lagDays: { min: 6, max: 12 },
+    frostSensitive: true,
+  },
+  dangerousLookalikes: [],
+  legallyProtected: false,
+  imageKeys: ['butyriboletus-appendiculatus-1'],
+  description: 'Kapelusz żółtobrązowy do rdzawobrązowego, pory żółte, sinieją. Trzon żółty z drobną siateczką, u podstawy zwężony w korzeniasty wyrostek. Pod dębami i bukami, w górach także pod jodłami. Rzadki.',
+};

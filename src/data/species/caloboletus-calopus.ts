@@ -1,0 +1,62 @@
+/**
+ * @file Rekord gatunku: gorzkoborowik żółtopory (Caloboletus calopus).
+ */
+import { mushroomId, type Mushroom } from '../../domain';
+
+export const caloboletusCalopus: Mushroom = {
+  id: mushroomId('caloboletus-calopus'),
+  scientificName: 'Caloboletus calopus',
+  scientificSynonyms: ['Boletus calopus'],
+  polishName: 'Gorzkoborowik żółtopory',
+  vernacularNames: ['borowik żółtopory'],
+  features: {
+    hymenophore: ['tubes'],
+    gillAttachment: ['not_applicable'], 
+    capColor: ['grey', 'cream', 'brown_light', 'olive'],
+    capShape: ['hemispherical', 'convex', 'flat'],
+    capSize: ['5_to_10', '10_to_20'],
+    capSurface: ['velvety', 'cracked'],
+    capMargin: ['smooth', 'inrolled'],
+    capPeelability: ['none'],
+    hymenophoreColor: ['yellow', 'olive'],
+    sporePrint: ['olive_brown'],
+    capFleshColor: ['white', 'cream'], 
+    capFleshColorChange: ['blue'],
+    bruising: ['blue'],
+    latex: ['none'],
+    stipeShape: ['clavate', 'cylindrical'],
+    stipeInterior: ['solid'],
+    stipeSurface: ['reticulate'], 
+    stipeColor: ['yellow', 'red'], 
+    stipeFleshColor: ['cream', 'yellow', 'red'],
+    stipeFleshColorChange: ['blue'],
+    volva: ['absent'],
+    stipeBase: ['plain'],
+    ring: ['none'],
+    growthHabit: ['solitary', 'scattered'],
+    smell: ['none'],
+    taste: ['bitter'],
+  },
+  edibility: {
+    category: 'inedible',
+    reasons: ['unpleasant_taste', 'minor_toxins'],
+    notes: 'Bardzo gorzki - jeden owocnik psuje całą potrawę.',
+  },
+  ecology: {
+    trophicModes: ['mycorrhizal'],
+    mycorrhizalPartners: ['fagus', 'picea', 'abies', 'quercus'],
+    substrates: ['soil'],
+    habitats: ['mixed_forest', 'coniferous_forest', 'deciduous_forest'],
+  },
+  fruiting: {
+    months: [7, 8, 9, 10],
+    optimalMeanTempC: { min: 10, max: 18 },
+    minPrecipitationMm: 20,
+    lagDays: { min: 6, max: 12 },
+    frostSensitive: true,
+  },
+  dangerousLookalikes: [],
+  legallyProtected: false,
+  imageKeys: ['caloboletus-calopus-1'],
+  description: 'Kapelusz jasnoszary do jasnobrązowego, pory żółte, trzon u góry żółty, niżej karminowoczerwony z jasną siateczką. Miąższ sinieje, bardzo gorzki. Częściej w górach, pod bukami i świerkami.',
+};
