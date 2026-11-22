@@ -13,6 +13,7 @@ import { useWeatherFilter, type ForecastKey } from '../../predictor';
 import { STAGE_SKIP_PL } from '../copy.pl';
 import {
   confirmStage,
+  revealHiddenDangerous,
   revisitStage,
   skippedOverview,
   type QuizAction,
@@ -34,6 +35,7 @@ interface ResultsViewProps {
   readonly progress: QuizProgressView;
   readonly threshold: number;
   readonly hasMoreQuestions: boolean;
+  readonly onReset: () => void;
   readonly dispatch: Dispatch<QuizAction>;
 }
 
@@ -44,23 +46,27 @@ export function ResultsView({
   progress,
   threshold,
   hasMoreQuestions,
+  onReset,
   dispatch,
 }: ResultsViewProps) {
   const router = useRouter();
   const [selectedWeatherKey, setSelectedWeatherKey] = useState<ForecastKey | null>(null);
   const weather = useWeatherFilter(selectedWeatherKey);
   const [onlyFavorableWeather, setOnlyFavorableWeather] = useState(false);
+  const [revealDangerous, setRevealDangerous] = useState(false);
   const weatherFilterActive = onlyFavorableWeather && weather.favorableIds !== null;
 
-  const effectiveRanking = useMemo<SimilarityRanking>(() => {
-    if (!weatherFilterActive || !weather.favorableIds) return ranking;
+  const { effectiveRanking, weatherHiddenCount } = useMemo(() => {
+    const base = revealDangerous ? revealHiddenDangerous(ranking) : ranking;
+    if (!weatherFilterActive || !weather.favorableIds) {
+      return { effectiveRanking: base, weatherHiddenCount: 0 };
+    }
     const ids = weather.favorableIds;
-    return {
-      ...ranking,
-      exact: ranking.exact.filter((entry) => ids.has(entry.species.id)),
-      partial: ranking.partial.filter((entry) => ids.has(entry.species.id)),
-    };
-  }, [ranking, weatherFilterActive, weather.favorableIds]);
+    const exact = base.exact.filter((entry) => ids.has(entry.species.id));
+    const partial = base.partial.filter((entry) => ids.has(entry.species.id));
+    const hiddenByWeather = (base.exact.length - exact.length) + (base.partial.length - partial.length);
+    return { effectiveRanking: { ...base, exact, partial }, weatherHiddenCount: hiddenByWeather };
+  }, [ranking, revealDangerous, weatherFilterActive, weather.favorableIds]);
 
   const rows = useMemo(
     () => buildResultRows({ ranking: effectiveRanking, skipped: skippedOverview(progress) }),
@@ -82,7 +88,14 @@ export function ResultsView({
     [dispatch, progress],
   );
   const revisitStageRow = useCallback((stage: QuizStage) => dispatch({ type: 'revisit_stage', stage }), [dispatch]);
-  const setThreshold = useCallback((value: number) => dispatch({ type: 'set_threshold', value }), [dispatch]);
+  const setThreshold = useCallback(
+    (value: number) => {
+      setRevealDangerous(false);
+      dispatch({ type: 'set_threshold', value });
+    },
+    [dispatch],
+  );
+  const revealAllDangerous = useCallback(() => setRevealDangerous(true), []);
 
   const keyExtractor = useCallback((row: ResultRow) => row.id, []);
   const getItemType = useCallback((row: ResultRow) => row.kind, []);
@@ -114,12 +127,16 @@ export function ResultsView({
         <View style={styles.header}>
           <GateBanner
             gate={gate}
-            totalSpecies={ranking.total}
-            hiddenDangerous={ranking.hiddenDangerous}
+            totalSpecies={effectiveRanking.total}
+            threshold={threshold}
+            hiddenDangerous={effectiveRanking.hiddenDangerous}
+            speciesById={speciesById}
+            onOpenSpecies={openSpecies}
             onCheck={check}
             onLowerThreshold={setThreshold}
+            onRevealDangerous={revealAllDangerous}
           />
-          <Text style={styles.summary}>{summarizeVisibility(effectiveRanking)}</Text>
+          <Text style={styles.summary}>{summarizeVisibility(effectiveRanking, weatherHiddenCount)}</Text>
           <Pressable
             disabled={!weather.available}
             onPress={() => setOnlyFavorableWeather((v) => !v)}
@@ -186,7 +203,7 @@ export function ResultsView({
           {hasMoreQuestions ? (
             <Button label="Wróć do pytań" variant="tinted" onPress={() => dispatch({ type: 'resume' })} />
           ) : null}
-          <Button label="Zacznij od nowa" variant="plain" onPress={() => dispatch({ type: 'reset' })} />
+          <Button label="Zacznij od nowa" variant="plain" onPress={onReset} />
           <Text style={styles.disclaimer}>Nie jedz grzyba na podstawie wskazań aplikacji.</Text>
         </View>
       }

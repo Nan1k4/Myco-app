@@ -24,6 +24,22 @@ describe('resultRows', () => {
     }
   });
 
+  it('podsumowanie z filtrem pogody wykazuje gatunki odfiltrowane poza pogodą i zachowuje bilans', () => {
+    const r = rankBySimilarity(index.species, { features }, 0.5);
+    const keepHalf = new Set(
+      [...r.exact, ...r.partial].filter((_, idx) => idx % 2 === 0).map((e) => e.species.id),
+    );
+    const exact = r.exact.filter((e) => keepHalf.has(e.species.id));
+    const partial = r.partial.filter((e) => keepHalf.has(e.species.id));
+    const weatherHidden = (r.exact.length - exact.length) + (r.partial.length - partial.length);
+    const filtered = { ...r, exact, partial };
+    const summary = summarizeVisibility(filtered, weatherHidden);
+    const visible = filtered.exact.length + filtered.partial.length + filtered.dangerous.length;
+    const hidden = filtered.hiddenHarmlessCount + filtered.hiddenDangerous.length;
+    expect(visible + hidden + weatherHidden + filtered.excludedIds.length).toBe(MUSHROOM_DB.species.length);
+    if (weatherHidden > 0) expect(summary).toContain(`poza pogodą: ${weatherHidden}`);
+  });
+
   it('wiersze: grupy mają pierwszy i ostatni element; pominięte etapy i pytania w kolejności quizu', () => {
     const selections = { features };
     const ranking = rankBySimilarity(index.species, selections, 0.5);

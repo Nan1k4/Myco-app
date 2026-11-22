@@ -63,8 +63,8 @@ export const suillellusLuridus: Mushroom = {
   dangerousLookalikes: [
     {
       mushroomId: mushroomId('rubroboletus-satanas'),
-      distinguishingFeatures: ['stipeShape', 'capFleshColorChange'],
-      note: 'Szatański ma białawy do szarawego kapelusz, brzuchaty trzon i miąższ, który sinieje słabo. Ponury ma oliwkowobrązowy kapelusz i miąższ natychmiast intensywnie siniejący.',
+      distinguishingFeatures: ['stipeShape'],
+      note: 'Szatański ma białawy do szarawego kapelusz, brzuchaty trzon i miąższ, który sinieje słabo. Ponury ma oliwkowobrązowy kapelusz, smuklejszy trzon i miąższ natychmiast intensywnie siniejący.',
     },
     {
       mushroomId: mushroomId('rubroboletus-legaliae'),

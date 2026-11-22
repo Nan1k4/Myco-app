@@ -65,13 +65,14 @@ export function buildResultRows({ ranking, skipped }: ResultRowsInput): readonly
 }
 
 /** „Widoczne: 6 z 13 · ukryte progiem: 5 (w tym trujące: 2) · wykluczone: 2”. */
-export function summarizeVisibility(ranking: SimilarityRanking): string {
+export function summarizeVisibility(ranking: SimilarityRanking, weatherHiddenCount = 0): string {
   const visible = ranking.exact.length + ranking.partial.length + ranking.dangerous.length;
   const hiddenDangerous = ranking.hiddenDangerous.length;
   const hidden = hiddenCount(ranking);
   const parts = [
     `Widoczne: ${visible} z ${ranking.total}`,
     `ukryte progiem: ${hidden}${hiddenDangerous > 0 ? ` (w tym trujące: ${hiddenDangerous})` : ''}`,
+    ...(weatherHiddenCount > 0 ? [`poza pogodą: ${weatherHiddenCount}`] : []),
     `wykluczone: ${ranking.excludedIds.length}`,
   ];
   return parts.join(' · ');

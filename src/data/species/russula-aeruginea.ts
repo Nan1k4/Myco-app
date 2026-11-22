@@ -58,8 +58,8 @@ export const russulaAeruginea: Mushroom = {
   dangerousLookalikes: [
     {
       mushroomId: mushroomId('amanita-phalloides'),
-      distinguishingFeatures: ['volva', 'ring', 'stipeBase'],
-      note: 'Z góry bardzo podobny do sromotnikowego. Wykop cały trzon: muchomor ma pierścień i białą pochwę u podstawy, gołąbek - kruchy trzon bez pierścienia i pochwy.',
+      distinguishingFeatures: ['volva', 'stipeBase'],
+      note: 'Z góry bardzo podobny do sromotnikowego. Wykop cały trzon: muchomor ma pierścień i białą pochwę u bulwiastej podstawy, gołąbek - kruchy trzon bez pierścienia, bez bulwy i bez pochwy.',
     },
   ],
   legallyProtected: false,

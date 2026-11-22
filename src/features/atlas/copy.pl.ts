@@ -2,7 +2,7 @@
  * @file Teksty atlasu. `Record<…>` - brak etykiety dla nowej wartości słownika to błąd kompilacji.
  * @module features/atlas/copy
  */
-import type { Month } from '../../domain';
+import type { Month, NonEmptyArray } from '../../domain';
 import type { AtlasSort, FacetGroupId } from './engine';
 
 
@@ -78,4 +78,34 @@ export const ATLAS_COPY_PL = {
 /** „cze-wrz”; jeden miesiąc - „sie”. */
 export function formatMonthRange(from: Month, to: Month): string {
   return from === to ? MONTH_SHORT_PL[from] : `${MONTH_SHORT_PL[from]}-${MONTH_SHORT_PL[to]}`;
+}
+
+/**
+ * Formatuje zbiór miesięcy owocnikowania w zwięzłe przedziały na cyklu 12-miesięcznym
+ * (np. `[1,2,3,10,11,12]` → `paź-mar`, `[9,10,11,12,1,2,3,4]` → `wrz-kwi`).
+ */
+export function formatMonthsLabel(months: NonEmptyArray<Month>): string {
+  const sorted = [...new Set(months)].sort((a, b) => a - b) as Month[];
+  if (sorted.length === 12) {
+    return formatMonthRange(1, 12);
+  }
+
+  const ranges: [Month, Month][] = [];
+  for (const month of sorted) {
+    const prev = ranges[ranges.length - 1];
+    if (prev && month === prev[1] + 1) {
+      prev[1] = month;
+    } else {
+      ranges.push([month, month]);
+    }
+  }
+
+  const first = ranges[0];
+  const last = ranges[ranges.length - 1];
+  if (ranges.length > 1 && first && last && first[0] === 1 && last[1] === 12) {
+    ranges.pop();
+    first[0] = last[0];
+  }
+
+  return ranges.map(([from, to]) => formatMonthRange(from, to)).join(', ');
 }

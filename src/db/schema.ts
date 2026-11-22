@@ -3,7 +3,7 @@ import type { FeatureKey } from '../domain';
 export const DB_NAME = 'myco.db';
 export const DB_SCHEMA_VERSION = '1';
 /** Musi zgadzać się z `MUSHROOM_DB.dataVersion` (weryfikowane przez `build:db`). */
-export const DB_DATA_VERSION = '2026.11.4';
+export const DB_DATA_VERSION = '2026.11.22';
 export const DB_VERSION_TAG = `${DB_SCHEMA_VERSION}:${DB_DATA_VERSION}`;
 
 export const MORPHOLOGY_COLUMNS = [

@@ -36,7 +36,12 @@ export function QuizScreen() {
   const pool = useMemo(() => visibleSpecies(ranking), [ranking]);
 
   const undo = useCallback(() => dispatch({ type: 'undo' }), []);
-  useHardwareBack(phase !== 'intro' && history.length > 0, undo);
+  const canResume = phase === 'results' && question !== null;
+  const handleHardwareBack = useCallback(() => {
+    if (canResume) dispatch({ type: 'resume' });
+    else undo();
+  }, [canResume, undo]);
+  useHardwareBack(phase !== 'intro' && (canResume || history.length > 0), handleHardwareBack);
 
   const confirmReset = useCallback(() => {
     Alert.alert('Zacząć od nowa?', 'Wszystkie dotychczasowe odpowiedzi zostaną wyczyszczone.', [
@@ -62,7 +67,7 @@ export function QuizScreen() {
       />
       <View style={styles.body}>
         <Animated.View
-          key={current?.key ?? 'results'}
+          key={current ? `${current.stage}:${current.key}` : 'results'}
           entering={transition.in}
           exiting={transition.out}
           needsOffscreenAlphaCompositing
@@ -78,6 +83,7 @@ export function QuizScreen() {
               progress={state}
               threshold={state.threshold}
               hasMoreQuestions={question !== null}
+              onReset={confirmReset}
               dispatch={dispatch}
             />
           )}

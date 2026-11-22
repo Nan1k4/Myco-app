@@ -63,7 +63,7 @@ export const russulaDelica: Mushroom = {
   dangerousLookalikes: [
     {
       mushroomId: mushroomId('amanita-virosa'),
-      distinguishingFeatures: ['ring', 'volva', 'gillAttachment'],
+      distinguishingFeatures: ['volva', 'gillAttachment'],
       note: 'Muchomor jadowity ma pierścień, workowatą pochwę u bulwiastej podstawy i wolne blaszki; gołąbek smaczny - lejkowaty, krępy, bez pierścienia i pochwy, blaszki przyrośnięte do zbiegających.',
     },
   ],

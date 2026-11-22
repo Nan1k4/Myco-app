@@ -57,8 +57,8 @@ export const lactifluusVolemus: Mushroom = {
   dangerousLookalikes: [
     {
       mushroomId: mushroomId('lactarius-rufus'),
-      distinguishingFeatures: ['latex', 'capSurface'],
-      note: 'Mleczaj rudy (surowy trujący, silnie piekący) ma gładki, rudobrązowy kapelusz i mleczko białe, o piekącym smaku, które nie brunatnieje; mleczaj smaczny ma mleczko słodkawe, obfite, brunatniejące.',
+      distinguishingFeatures: ['capFleshColorChange', 'bruising', 'capSurface'],
+      note: 'Mleczaj rudy (surowy trujący, silnie piekący) ma gładki, rudobrązowy kapelusz i mleczko białe, o piekącym smaku, które nie brunatnieje; mleczaj smaczny ma mleczko słodkawe, obfite, a miąższ i blaszki brunatnieją.',
     },
   ],
   legallyProtected: false,

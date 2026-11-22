@@ -9,7 +9,7 @@ import { ALL_SPECIES } from './species';
 
 export const MUSHROOM_DB: MushroomDatabase = {
   schemaVersion: SCHEMA_VERSION,
-  dataVersion: '2026.11.4',
+  dataVersion: '2026.11.22',
   species: ALL_SPECIES,
 };
 

@@ -145,6 +145,7 @@ function describeFailure(outcome: FixOutcome): string {
 /* -------------------------------- Narzędzia ------------------------------- */
 
 async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | typeof TIMEOUT> {
+  void promise.catch(() => undefined);
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<typeof TIMEOUT>((resolve) => {
     timer = setTimeout(() => resolve(TIMEOUT), ms);

@@ -45,7 +45,7 @@ export const lepistaNuda: Mushroom = {
       youngSpecimensOnly: false,
       notes: 'Obowiązkowo dokładna obróbka cieplna (np. obgotować i wywar odlać); na surowo powoduje dolegliwości żołądkowe. Najlepsze młode okazy.',
     },
-    notes: 'Smaczny po obróbce, ale bywa alergizujący - pierwszy raz jeść niewielką porcję. Łatwo pomylić z fioletowymi zasłonakami.',
+    notes: 'Smaczny po obróbce, ale bywa alergizujący - pierwszy raz jeść niewielką porcję. Łatwo pomylić z fioletowymi zasłonakami (m.in. niejadalnym zasłonakiem fioletowym o rdzawym wysypie i łuseczkowatym kapeluszu).',
   },
   ecology: {
     trophicModes: ['saprotrophic'],
@@ -61,11 +61,6 @@ export const lepistaNuda: Mushroom = {
     frostSensitive: false,
   },
   dangerousLookalikes: [
-    {
-      mushroomId: mushroomId('cortinarius-violaceus'),
-      distinguishingFeatures: ['sporePrint', 'capSurface', 'hymenophoreColor'],
-      note: 'Zasłonak fioletowy (Cortinarius violaceus): wysyp rdzawobrązowy, kapelusz ciemnofioletowy, łuseczkowaty i suchy, blaszki ciemne, rzadkie; gąsówka ma kapelusz gładki i wysyp różowawy.',
-    },
     {
       mushroomId: mushroomId('cortinarius-traganus'),
       distinguishingFeatures: ['sporePrint'],

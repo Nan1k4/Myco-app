@@ -57,7 +57,7 @@ export const russulaVirescens: Mushroom = {
   dangerousLookalikes: [
     {
       mushroomId: mushroomId('amanita-phalloides'),
-      distinguishingFeatures: ['ring', 'volva', 'stipeBase', 'capSurface'],
+      distinguishingFeatures: ['volva', 'stipeBase', 'capSurface'],
       note: 'Muchomor zielonawy (śmiertelnie trujący - amatoksyny) ma pierścień na trzonie, workowatą pochwę u bulwiastej podstawy trzonu, kapelusz gładki z włókienkami i miąższ włóknisty; gołąbek zielonawy nie ma pierścienia ani pochwy, kapelusz jest mozaikowo spękany, a miąższ kruchy.',
     },
   ],

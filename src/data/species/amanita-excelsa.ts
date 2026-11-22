@@ -63,7 +63,7 @@ export const amanitaExcelsa: Mushroom = {
   dangerousLookalikes: [
     {
       mushroomId: mushroomId('amanita-pantherina'),
-      distinguishingFeatures: ['ring', 'capMargin', 'stipeBase'],
+      distinguishingFeatures: ['ring', 'stipeBase'],
       note: 'Plamisty ma gładki pierścień, prążkowany brzeg kapelusza, czysto białe łatki i bulwę z ostrym obrzeżeniem. Twardawy - pierścień prążkowany od góry, gładki brzeg, szarawe łatki.',
     },
   ],

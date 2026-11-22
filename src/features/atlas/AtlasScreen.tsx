@@ -44,7 +44,16 @@ export function AtlasScreen() {
       favorableWeather: state.filters.favorableWeather && weather.available,
       favorableIds: weather.favorableIds,
     }),
-    [deferredSearch, state.filters.months, state.filters.inSeasonNow, currentMonth, state.filters.facets],
+    [
+      deferredSearch,
+      state.filters.months,
+      state.filters.inSeasonNow,
+      currentMonth,
+      state.filters.facets,
+      state.filters.favorableWeather,
+      weather.available,
+      weather.favorableIds,
+    ],
   );
 
   const speciesList = useMemo(
@@ -58,7 +67,7 @@ export function AtlasScreen() {
     [filtersOpen, queryParams],
   );
 
-  const activeCount = activeFilterCount(state.filters);
+  const activeCount = activeFilterCount(state.filters, weather.available);
   const closeFilters = useCallback(() => setFiltersOpen(false), []);
   const openFilters = useCallback(() => setFiltersOpen(true), []);
 
@@ -151,7 +160,6 @@ export function AtlasScreen() {
               dispatch={dispatch}
               onClose={closeFilters}
               onSavePreset={savePreset}
-              onSliderDragging={() => undefined}
               weatherAvailable={weather.available}
               weatherLocationLabel={weather.locationLabel}
               weatherLocations={weather.locations}

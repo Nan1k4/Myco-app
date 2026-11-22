@@ -63,12 +63,12 @@ export const amanitaCrocea: Mushroom = {
   dangerousLookalikes: [
     {
       mushroomId: mushroomId('amanita-phalloides'),
-      distinguishingFeatures: ['capMargin', 'stipeBase', 'ring'],
+      distinguishingFeatures: ['capMargin', 'stipeBase'],
       note: 'Żółtawe formy muchomora zielonawego mają gładki brzeg kapelusza, bulwę u podstawy i zwykle pierścień - który może odpaść.',
     },
     {
       mushroomId: mushroomId('amanita-gemmata'),
-      distinguishingFeatures: ['stipeBase', 'stipeSurface', 'capSurface'],
+      distinguishingFeatures: ['stipeBase', 'stipeSurface'],
       note: 'Narcyzowy ma bladożółty kapelusz z białymi łatkami, bulwę z kołnierzykowatym obrzeżeniem i nietrwały pierścień; szafranowy - pomarańczowożółty, bez bulwy, z szafranowymi zygzakami na trzonie.',
     },
   ],

@@ -14,7 +14,7 @@ export const hydnumRepandum: Mushroom = {
   vernacularNames: ['kolczak'],
   features: {
     hymenophore: ['teeth'],
-    gillAttachment: ['decurrent'],
+    gillAttachment: ['not_applicable'],
     capColor: ['cream', 'ochre', 'orange'],
     capShape: ['convex', 'flat', 'depressed'], 
     capSize: ['under_5', '5_to_10', '10_to_20'],

@@ -57,12 +57,12 @@ export const kuehneromycesMutabilis: Mushroom = {
   dangerousLookalikes: [
     {
       mushroomId: mushroomId('galerina-marginata'),
-      distinguishingFeatures: ['stipeSurface', 'capSurface'],
+      distinguishingFeatures: ['stipeSurface'],
       note: 'Hełmówka jadowita (śmiertelna) ma trzon gładki, jedwabisto-włókienkowaty (bez ciemnych łusek pod pierścieniem), zapach mączny i częściej rośnie na mchu na drewnie; łuszczak ma łuskowaty trzon poniżej pierścienia i przyjemny zapach.',
     },
     {
       mushroomId: mushroomId('hypholoma-fasciculare'),
-      distinguishingFeatures: ['hymenophoreColor', 'sporePrint', 'ring'],
+      distinguishingFeatures: ['hymenophoreColor', 'ring'],
       note: 'Maślanka wiązkowa ma żółte, potem zielonkawe blaszki, purpurowobrązowy wysyp i bardzo gorzki smak; łuszczak - blaszki jasnobrązowe, wysyp brązowy, smak łagodny, wyraźny pierścień.',
     },
   ],

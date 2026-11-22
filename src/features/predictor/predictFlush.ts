@@ -67,7 +67,7 @@ const LEVEL_THRESHOLDS: readonly (readonly [number, FlushLevel])[] = [
   [20, 'low'],
 ];
 
-const CONFIDENCE = {
+export const CONFIDENCE = {
   highMinCompleteness: 0.95,
   mediumMinCompleteness: 0.75,
   highMaxAgeH: 6,

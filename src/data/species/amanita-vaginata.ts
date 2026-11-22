@@ -63,18 +63,18 @@ export const amanitaVaginata: Mushroom = {
   dangerousLookalikes: [
     {
       mushroomId: mushroomId('amanita-phalloides'),
-      distinguishingFeatures: ['capMargin', 'stipeBase', 'ring'],
+      distinguishingFeatures: ['capMargin', 'stipeBase'],
       note: 'Muchomor zielonawy ma gładki (nieprążkowany) brzeg kapelusza, bulwę u podstawy i zwykle pierścień - który może odpaść.',
     },
     {
       mushroomId: mushroomId('amanita-virosa'),
-      distinguishingFeatures: ['capMargin', 'stipeBase', 'ring'],
+      distinguishingFeatures: ['capMargin', 'stipeBase'],
       note: 'Białe formy pochwiastego bardzo łatwo pomylić z jadowitym. Jadowity ma gładki brzeg kapelusza, kosmkowaty trzon z pierścieniem i bulwę.',
     },
     {
       mushroomId: mushroomId('amanita-pantherina'),
-      distinguishingFeatures: ['ring', 'stipeBase', 'capSurface'],
-      note: 'Plamisty ma białe łatki na kapeluszu, pierścień i bulwę z obrzeżeniem; pochwiasty - zwykle gładki kapelusz, bez pierścienia, z workowatą pochwą bez bulwy.',
+      distinguishingFeatures: ['stipeBase', 'stipeSurface'],
+      note: 'Plamisty ma białe łatki na kapeluszu, pierścień i bulwę z obrzeżeniem; pochwiasty - zwykle gładki kapelusz, bez pierścienia, z zygzakowatym trzonem i workowatą pochwą bez bulwy.',
     },
   ],
   legallyProtected: false,

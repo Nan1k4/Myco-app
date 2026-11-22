@@ -63,8 +63,8 @@ export const neoboletusLuridiformis: Mushroom = {
   dangerousLookalikes: [
     {
       mushroomId: mushroomId('rubroboletus-satanas'),
-      distinguishingFeatures: ['stipeSurface', 'capFleshColorChange'],
-      note: 'Szatański ma na trzonie czerwoną siateczkę (nie kropki), białawy kapelusz i miąższ siniejący słabo. Ceglastopory ma ciemnobrązowy kapelusz, kropkowany trzon i miąższ natychmiast granatowiejący.',
+      distinguishingFeatures: ['stipeSurface', 'stipeShape'],
+      note: 'Szatański ma na trzonie czerwoną siateczkę (nie kropki), brzuchaty trzon, białawy kapelusz i miąższ siniejący słabo. Ceglastopory ma ciemnobrązowy kapelusz, kropkowany trzon i miąższ natychmiast granatowiejący.',
     },
     {
       mushroomId: mushroomId('rubroboletus-legaliae'),

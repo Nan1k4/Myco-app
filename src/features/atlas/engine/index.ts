@@ -24,6 +24,7 @@ export {
   atlasReducer,
   validatePresetName,
   type AtlasAction,
+  type AtlasDirtyFlags,
   type AtlasPreset,
   type AtlasState,
   type PresetNameError,

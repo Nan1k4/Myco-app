@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState, type Dispatch } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from '../../../components/Button';
 import type { AtlasFacetsResult } from '../../../db/types';
 import type { Month } from '../../../domain';
@@ -36,7 +37,6 @@ interface FilterPanelProps {
   readonly dispatch: Dispatch<AtlasAction>;
   readonly onClose: () => void;
   readonly onSavePreset: (name: string) => void;
-  readonly onSliderDragging: (dragging: boolean) => void;
 }
 
 const INITIALLY_EXPANDED: ReadonlySet<FacetGroupId> = new Set(['edibility', 'season']);
@@ -56,11 +56,12 @@ export function FilterPanel({
   dispatch,
   onClose,
   onSavePreset,
-  onSliderDragging,
 }: FilterPanelProps) {
+  const insets = useSafeAreaInsets();
+  const [sliderDragging, setSliderDragging] = useState(false);
   const [expanded, setExpanded] = useState<ReadonlySet<FacetGroupId>>(INITIALLY_EXPANDED);
   const { filters } = state;
-  const active = activeFilterCount(filters);
+  const active = activeFilterCount(filters, weatherAvailable);
 
   const toggleGroup = (id: FacetGroupId) =>
     setExpanded((set) => {
@@ -78,7 +79,7 @@ export function FilterPanel({
 
   return (
     <View style={styles.root}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top, minHeight: MIN_TOUCH + 12 + insets.top }]}>
         <Text style={styles.title} accessibilityRole="header">
           {ATLAS_COPY_PL.filters}
         </Text>
@@ -98,7 +99,11 @@ export function FilterPanel({
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        scrollEnabled={!sliderDragging}
+      >
         <PresetBar
           presets={state.presets}
           canSave={active > 0}
@@ -131,7 +136,7 @@ export function FilterPanel({
                   onInSeasonNow={(value) => dispatch({ type: 'set_in_season_now', value })}
                   onFavorableWeather={(value) => dispatch({ type: 'set_favorable_weather', value })}
                   onSelectWeatherKey={onSelectWeatherKey}
-                  onDragging={onSliderDragging}
+                  onDragging={setSliderDragging}
                 />
               ) : (
                 group.facets.map((facetId) => {
@@ -161,7 +166,7 @@ export function FilterPanel({
         ))}
       </ScrollView>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: SPACE.l + insets.bottom }]}>
         <Button label={`Pokaż ${matchCount} z ${totalCount}`} onPress={onClose} />
       </View>
     </View>

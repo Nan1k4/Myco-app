@@ -58,13 +58,13 @@ export const amanitaCitrina: Mushroom = {
   dangerousLookalikes: [
     {
       mushroomId: mushroomId('amanita-phalloides'),
-      distinguishingFeatures: ['stipeBase', 'volva'],
-      note: 'Cytrynowy pachnie surowym ziemniakiem i ma kulistą bulwę z rowkiem; zielonawy ma workowatą, odstającą pochwę i bez zapachu ziemniaka. Przy wątpliwości traktować jak zielonawy.',
+      distinguishingFeatures: ['stipeBase', 'capSurface'],
+      note: 'Cytrynowy pachnie surowym ziemniakiem i ma kulistą bulwę z rowkiem oraz łatki na kapeluszu; zielonawy ma zaokrągloną bulwę z workowatą pochwą i bez zapachu ziemniaka. Przy wątpliwości traktować jak zielonawy.',
     },
     {
       mushroomId: mushroomId('amanita-virosa'),
-      distinguishingFeatures: ['stipeBase', 'volva'],
-      note: 'Biała forma cytrynowego bywa mylona z jadowitym - jadowity ma workowatą pochwę i nie pachnie ziemniakiem.',
+      distinguishingFeatures: ['stipeBase', 'capSurface'],
+      note: 'Biała forma cytrynowego bywa mylona z jadowitym - jadowity ma gładki kapelusz, zaokrągloną bulwę z workowatą pochwą i nie pachnie ziemniakiem.',
     },
   ],
   legallyProtected: false,

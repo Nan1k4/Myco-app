@@ -1,14 +1,17 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { Button } from '../../../components/Button';
 import { Icon, type IconName } from '../../../components/icons/Icon';
 import { REFLOW } from '../../../components/motion';
-import type { FilterResult } from '../../../domain';
+import type { SpeciesBasicInfo } from '../../../db/types';
+import type { FilterResult, MushroomId } from '../../../domain';
 import { FEATURE_LABELS_PL } from '../../../i18n/pl';
-import { BORDER_RADIUS, COLORS, FILLS, SPACE, TYPE } from '../../../theme';
-import { THRESHOLD, type QuizKey, type SimilarityEntry } from '../engine';
+import { BORDER_RADIUS, COLORS, FILLS, MIN_TOUCH, RADIUS, SPACE, TYPE } from '../../../theme';
+import { thresholdToReveal, type QuizKey, type SimilarityEntry } from '../engine';
 
 type Status = FilterResult['status'];
+
+const MAX_NAMED_HIDDEN = 3;
 
 const TONE = {
   clear: { bg: FILLS.neutral, border: COLORS.border, ink: COLORS.text, icon: 'info' },
@@ -28,16 +31,32 @@ const TONE = {
 interface GateBannerProps {
   readonly gate: FilterResult;
   readonly totalSpecies: number;
+  readonly threshold: number;
   readonly hiddenDangerous: readonly SimilarityEntry[];
+  readonly speciesById: ReadonlyMap<MushroomId, SpeciesBasicInfo>;
+  readonly onOpenSpecies: (id: MushroomId) => void;
   readonly onCheck: (key: QuizKey) => void;
   readonly onLowerThreshold: (value: number) => void;
+  readonly onRevealDangerous: () => void;
 }
 
-export function GateBanner({ gate, totalSpecies, hiddenDangerous, onCheck, onLowerThreshold }: GateBannerProps) {
+export function GateBanner({
+  gate,
+  totalSpecies,
+  threshold,
+  hiddenDangerous,
+  speciesById,
+  onOpenSpecies,
+  onCheck,
+  onLowerThreshold,
+  onRevealDangerous,
+}: GateBannerProps) {
   const tone = TONE[gate.status];
   const { title, body } = describe(gate, totalSpecies);
   const hasHiddenDangerous = hiddenDangerous.length > 0;
-  const target = hasHiddenDangerous ? thresholdToReveal(hiddenDangerous) : THRESHOLD.min;
+  const target = hasHiddenDangerous ? thresholdToReveal(hiddenDangerous, threshold) : null;
+  const preview = hiddenDangerous.slice(0, MAX_NAMED_HIDDEN);
+  const extraCount = hiddenDangerous.length - preview.length;
 
   return (
     <Animated.View
@@ -58,14 +77,47 @@ export function GateBanner({ gate, totalSpecies, hiddenDangerous, onCheck, onLow
       {hasHiddenDangerous ? (
         <View style={styles.block}>
           <Text style={styles.hiddenNote}>
-            Obecny próg dopasowania ukrywa część niewykluczonych gatunków trujących. Obniż próg, aby zobaczyć pełną listę ryzyka.
+            {target !== null
+              ? 'Obecny próg dopasowania ukrywa część niewykluczonych gatunków trujących. Obniż próg, aby zobaczyć pełną listę ryzyka:'
+              : 'Próg 50% nie obejmuje wszystkich niewykluczonych gatunków trujących. Część ma niższe dopasowanie:'}
           </Text>
-          <Button
-            label={`Pokaż ukryte — obniż próg do ${Math.round(target * 100)}%`}
-            icon="eye-outline"
-            variant="danger"
-            onPress={() => onLowerThreshold(target)}
-          />
+          <View style={styles.hiddenList}>
+            {preview.map((entry) => {
+              const name = speciesById.get(entry.species.id)?.polishName ?? entry.species.id;
+              const percent = Math.round(entry.score * 100);
+              return (
+                <Pressable
+                  key={entry.species.id}
+                  onPress={() => onOpenSpecies(entry.species.id)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${name}, zgodność ${percent} procent`}
+                  style={({ pressed }) => [styles.hiddenItem, pressed && styles.hiddenItemPressed]}
+                >
+                  <Text style={styles.hiddenItemName} numberOfLines={1} ellipsizeMode="tail">
+                    {name}
+                  </Text>
+                  <Text style={styles.hiddenItemScore}>{percent}%</Text>
+                  <Icon name="chevron-forward" size={14} color={COLORS.dangerText} />
+                </Pressable>
+              );
+            })}
+            {extraCount > 0 ? <Text style={styles.hiddenNote}>… oraz jeszcze {extraCount}</Text> : null}
+          </View>
+          {target !== null ? (
+            <Button
+              label={`Pokaż ukryte — obniż próg do ${Math.round(target * 100)}%`}
+              icon="eye-outline"
+              variant="danger"
+              onPress={() => onLowerThreshold(target)}
+            />
+          ) : (
+            <Button
+              label={`Pokaż wszystkie niewykluczone trujące (${hiddenDangerous.length})`}
+              icon="eye-outline"
+              variant="danger"
+              onPress={onRevealDangerous}
+            />
+          )}
         </View>
       ) : null}
 
@@ -79,11 +131,6 @@ export function GateBanner({ gate, totalSpecies, hiddenDangerous, onCheck, onLow
       ) : null}
     </Animated.View>
   );
-}
-
-function thresholdToReveal(entries: readonly SimilarityEntry[]): number {
-  const lowest = Math.min(...entries.map((entry) => entry.score));
-  return Math.max(THRESHOLD.min, Math.floor(lowest / THRESHOLD.step) * THRESHOLD.step);
 }
 
 function describe(gate: FilterResult, totalSpecies: number): { readonly title: string; readonly body: string } {
@@ -124,6 +171,20 @@ const styles = StyleSheet.create({
   title: { ...TYPE.headline },
   body: { ...TYPE.subhead, color: COLORS.text },
   hiddenNote: { ...TYPE.footnote, color: COLORS.textMuted },
+  hiddenList: { gap: SPACE.xs },
+  hiddenItem: {
+    minHeight: MIN_TOUCH,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACE.s,
+    paddingHorizontal: SPACE.m,
+    paddingVertical: SPACE.xs,
+    borderRadius: RADIUS.s,
+    backgroundColor: COLORS.dangerBg,
+  },
+  hiddenItemPressed: { opacity: 0.78 },
+  hiddenItemName: { ...TYPE.footnote, fontWeight: '600', color: COLORS.dangerText, flex: 1, flexShrink: 1 },
+  hiddenItemScore: { ...TYPE.caption, fontWeight: '700', color: COLORS.dangerText, fontVariant: ['tabular-nums'] },
   block: {
     gap: SPACE.s,
     paddingTop: SPACE.m,

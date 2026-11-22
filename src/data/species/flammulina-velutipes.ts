@@ -57,7 +57,7 @@ export const flammulinaVelutipes: Mushroom = {
   dangerousLookalikes: [
     {
       mushroomId: mushroomId('galerina-marginata'),
-      distinguishingFeatures: ['sporePrint', 'ring', 'stipeSurface'],
+      distinguishingFeatures: ['sporePrint', 'stipeSurface'],
       note: 'Hełmówka obrzeżona (śmiertelnie trująca - amatoksyny) ma rdzawobrązowy wysyp, resztki pierścienia na trzonie i trzon bez aksamitnego, czarniejącego dołu; płomiennica ma biały wysyp, brak pierścienia i aksamitny, ciemny trzon. Obie rosną na drewnie.',
     },
   ],

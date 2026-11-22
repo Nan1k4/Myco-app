@@ -64,6 +64,7 @@ export const FACET_GROUPS: readonly { readonly id: FacetGroupId; readonly facets
 ];
 
 const PROTECTED = 'protected';
+const UNPROTECTED = 'unprotected';
 
 function featureFacet<K extends AtlasFeatureKey>(key: K): Facet {
   return {
@@ -91,8 +92,11 @@ export const FACETS: Readonly<Record<FacetId, Facet>> = {
   legal: {
     id: 'legal',
     label: 'Ochrona',
-    options: [plain(PROTECTED, 'Gatunek chroniony')],
-    valuesOf: (s) => (s.legallyProtected ? [PROTECTED] : []),
+    options: [
+      plain(PROTECTED, 'Gatunek chroniony'),
+      plain(UNPROTECTED, 'Gatunek niechroniony'),
+    ],
+    valuesOf: (s) => [s.legallyProtected ? PROTECTED : UNPROTECTED],
   },
   habitat: {
     id: 'habitat',
@@ -134,7 +138,15 @@ export const FACETS: Readonly<Record<FacetId, Facet>> = {
   stipeSurface: featureFacet('stipeSurface'),
   volva: featureFacet('volva'),
   stipeBase: featureFacet('stipeBase'),
-  ring: featureFacet('ring'),
+  ring: {
+    ...featureFacet('ring'),
+    // Walidator wymaga 'none' u każdego gatunku z pierścieniem (pierścień bywa zniszczony),
+    // więc w Atlasie „Brak” oznacza wyłącznie gatunki niemające pierścienia (`['none']`).
+    valuesOf: (species) => {
+      const withRing = species.features.ring.filter((value) => value !== 'none');
+      return withRing.length > 0 ? withRing : ['none'];
+    },
+  },
   growthHabit: featureFacet('growthHabit'),
   smell: featureFacet('smell'),
 };

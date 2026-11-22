@@ -47,6 +47,24 @@ describe('atlasReducer', () => {
     const full = Array.from({ length: MAX_PRESETS }, (_, n) => preset(`p-${n}`, `Z${n}`));
     expect(validatePresetName('Nowy', full)).toBe('limit');
   });
+
+  it('opóźniony hydrate nie nadpisuje filtrów i sortowania zmienionych przed odczytem, ale przywraca pozostałe dane', () => {
+    const preHydrate = run([
+      { type: 'toggle', facet: 'capColor', value: 'red' },
+      { type: 'set_search', search: 'borowik' },
+    ]);
+    const hydrated = atlasReducer(preHydrate, {
+      type: 'hydrate',
+      filters: { facets: { edibility: ['edible'] }, months: { from: 6, to: 9 }, inSeasonNow: true, favorableWeather: true },
+      sort: 'edible_first',
+      presets: [preset('a-1', 'Wystawa')],
+    });
+    expect(hydrated.hydrated).toBe(true);
+    expect(hydrated.filters).toEqual({ facets: { capColor: ['red'] }, months: null, inSeasonNow: false, favorableWeather: false });
+    expect(hydrated.sort).toBe('edible_first');
+    expect(hydrated.presets.map((p) => p.id)).toEqual(['a-1']);
+    expect(hydrated.search).toBe('borowik');
+  });
 });
 
 describe('atlasStorage', () => {

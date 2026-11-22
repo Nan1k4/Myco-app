@@ -9,6 +9,8 @@ import {
   HABITATS,
   SUBSTRATE_GROUPS,
   TREE_GENERA,
+  VALUE_PROCEDURE_OVERRIDES,
+  requiredProcedures,
   type CriticalCheck,
   type FeatureKey,
   type FeatureSelections,
@@ -17,6 +19,7 @@ import {
   type FilterResult,
   type FilterSelections,
   type GateFeatureKey,
+  type ObservationProcedure,
   isGateFeatureKey,
 } from '../../../domain';
 import type { IndexedSpecies } from '../../filter/engine/filterIndex';
@@ -64,8 +67,15 @@ export const STAGE_HIDES: { readonly [S in QuizStage]?: readonly QuizStage[] } =
 const SKIPPABLE_STAGES: ReadonlySet<QuizStage> = new Set<QuizStage>(['touch', 'dig_base', 'cut', 'smell', 'spore_print']);
 const REQUIRED_KEYS: ReadonlySet<QuizKey> = new Set<QuizKey>(['habitat', 'substrate']);
 const STAGE_RANK: ReadonlyMap<QuizStage, number> = new Map(STAGE_ORDER.map((stage, rank) => [stage, rank]));
+const STAGE_BY_NAME: ReadonlyMap<string, QuizStage> = new Map(STAGE_ORDER.map((stage) => [stage, stage]));
 const STAGE_OF: ReadonlyMap<QuizKey, QuizStage> = new Map(
   STAGE_ORDER.flatMap((stage) => STAGE_SEQUENCE[stage].map((key) => [key, stage] as const)),
+);
+const OVERRIDE_PROCEDURES: ReadonlyMap<string, ReadonlyMap<string, readonly ObservationProcedure[]>> = new Map(
+  Object.entries(VALUE_PROCEDURE_OVERRIDES).map(([key, valueMap]) => [
+    key,
+    new Map(Object.entries(valueMap ?? {}).flatMap(([value, procs]) => (procs ? [[value, procs] as const] : []))),
+  ]),
 );
 const CARRY_KEYS = Object.keys(CARRY_OVER) as QuizKey[];
 export const REVIEW_IN: { readonly [K in QuizKey]?: QuizStage } = Object.fromEntries(
@@ -77,7 +87,25 @@ export const REVIEW_IN: { readonly [K in QuizKey]?: QuizStage } = Object.fromEnt
     }),
   ),
 );
-const REVIEW_KEYS = Object.keys(REVIEW_IN) as QuizKey[];
+const POSSIBLE_REVIEW_STAGES: ReadonlyMap<QuizKey, ReadonlySet<QuizStage>> = new Map(
+  STAGE_ORDER.flatMap((stage) =>
+    STAGE_SEQUENCE[stage].flatMap((key) => {
+      if (isEnvironmentKey(key)) return [];
+      const stages = new Set<QuizStage>();
+      const base = REVIEW_IN[key];
+      if (base) stages.add(base);
+      const overrides = OVERRIDE_PROCEDURES.get(key);
+      if (overrides) {
+        for (const procs of overrides.values()) {
+          const required = maxStageOfProcedures(procs, stage);
+          if (stageRank(required) > stageRank(stage)) stages.add(required);
+        }
+      }
+      return stages.size > 0 ? [[key, stages] as const] : [];
+    }),
+  ),
+);
+const POSSIBLE_REVIEW_KEYS = [...POSSIBLE_REVIEW_STAGES.keys()];
 
 export function isStageSkippable(stage: QuizStage): boolean {
   return SKIPPABLE_STAGES.has(stage);
@@ -93,7 +121,9 @@ export function isNoContactStage(stage: QuizStage): boolean {
 }
 
 function keysAskedIn(stage: QuizStage): readonly QuizKey[] {
-  const carried = [...CARRY_KEYS, ...REVIEW_KEYS].filter((key) => REVIEW_IN[key] === stage || CARRY_OVER[key] === stage);
+  const carried = [...CARRY_KEYS, ...POSSIBLE_REVIEW_KEYS].filter(
+    (key) => CARRY_OVER[key] === stage || POSSIBLE_REVIEW_STAGES.get(key)?.has(stage),
+  );
   return [...new Set([...carried, ...STAGE_SEQUENCE[stage]])];
 }
 
@@ -181,12 +211,43 @@ export function isApplicable(key: QuizKey, { features }: FilterSelections): bool
   return CONDITIONS[key]?.(features) ?? true;
 }
 
-export function canConfirmIn(key: QuizFeatureKey, stage: QuizStage): boolean {
-  return isGateFeatureKey(key) && stageRank(stage) >= stageRank(FEATURE_PROCEDURES[key]);
+export function canConfirmIn<K extends QuizFeatureKey>(key: K, stage: QuizStage, value?: FeatureValueMap[K]): boolean {
+  if (!isGateFeatureKey(key)) return false;
+  const procedures: readonly ObservationProcedure[] =
+    value !== undefined ? requiredProcedures(key, value) : [FEATURE_PROCEDURES[key]];
+  return stageRank(stage) >= Math.max(...procedures.map(procedureRank));
 }
 
 function stageRank(stage: QuizStage): number {
   return STAGE_RANK.get(stage) ?? 0;
+}
+
+function procedureRank(procedure: ObservationProcedure): number {
+  const stage = STAGE_BY_NAME.get(procedure);
+  return stage !== undefined ? stageRank(stage) : Number.POSITIVE_INFINITY;
+}
+
+function maxStageOfProcedures(procedures: readonly ObservationProcedure[], fallback: QuizStage): QuizStage {
+  let best = fallback;
+  let bestRank = -1;
+  for (const procedure of procedures) {
+    const stage = STAGE_BY_NAME.get(procedure);
+    if (stage !== undefined && stageRank(stage) > bestRank) {
+      best = stage;
+      bestRank = stageRank(stage);
+    }
+  }
+  return best;
+}
+
+function reviewStageFor(key: QuizKey, selections: FilterSelections): QuizStage | undefined {
+  if (isEnvironmentKey(key)) return undefined;
+  const observation = selections.features[key];
+  if (!observation) return REVIEW_IN[key];
+  const procedures = OVERRIDE_PROCEDURES.get(key)?.get(observation.value) ?? [FEATURE_PROCEDURES[key]];
+  const home = stageOf(key);
+  const required = maxStageOfProcedures(procedures, home);
+  return stageRank(required) > stageRank(home) ? required : undefined;
 }
 
 /* ------------------------------ Następne pytanie --------------------------- */
@@ -260,7 +321,7 @@ export function revisitStage(key: QuizKey, progress: QuizProgressView): QuizStag
 }
 
 export function confirmStage(key: QuizKey, progress: QuizProgressView): QuizStage {
-  const review = REVIEW_IN[key];
+  const review = reviewStageFor(key, progress.selections);
   return review !== undefined && !hiddenStages(progress.skippedStages).has(review) ? review : stageOf(key);
 }
 
@@ -279,10 +340,12 @@ export function pendingDigQuestion(progress: QuizProgressView): QuizKey | null {
 
 export function reviewableIn(stage: QuizStage, progress: QuizProgressView): readonly QuizKey[] {
   const answered = answeredKeys(progress.selections);
-  return REVIEW_KEYS.filter(
+  return POSSIBLE_REVIEW_KEYS.filter(
     (key) =>
-      REVIEW_IN[key] === stage &&
+      !isEnvironmentKey(key) &&
+      reviewStageFor(key, progress.selections) === stage &&
       answered.has(key) &&
+      progress.selections.features[key]?.certainty === 'uncertain' &&
       progress.answeredIn.get(key) !== stage &&
       isApplicable(key, progress.selections),
   );

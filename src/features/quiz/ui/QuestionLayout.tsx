@@ -142,7 +142,18 @@ export function QuestionLayout({ frame, check = null, children, footer = null }:
           onCancel={close}
         />
       ) : overlay.kind === 'skipped' ? (
-        <SkippedPanel groups={frame.skipped} onRevisit={frame.onRevisit} onRevisitStage={frame.onRevisitStage} onClose={close} />
+        <SkippedPanel
+          groups={frame.skipped}
+          onRevisit={(key) => {
+            close();
+            frame.onRevisit(key);
+          }}
+          onRevisitStage={(stage) => {
+            close();
+            frame.onRevisitStage(stage);
+          }}
+          onClose={close}
+        />
       ) : (
         footer
       )}

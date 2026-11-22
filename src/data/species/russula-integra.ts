@@ -57,8 +57,8 @@ export const russulaIntegra: Mushroom = {
   dangerousLookalikes: [
     {
       mushroomId: mushroomId('russula-sardonia'),
-      distinguishingFeatures: ['hymenophoreColor', 'sporePrint'],
-      note: 'Czerwonofioletowy ma cytrynowożółte blaszki, fioletowy trzon, jasny wysyp i palący smak; słodkawy - biały trzon, ochrowe blaszki i wysyp, smak łagodny.',
+      distinguishingFeatures: ['sporePrint'],
+      note: 'Czerwonofioletowy ma cytrynowożółte blaszki, fioletowy trzon, kremowy wysyp i palący smak; słodkawy - biały trzon, ochrowe blaszki i żółty wysyp, smak łagodny.',
     },
     {
       mushroomId: mushroomId('russula-queletii'),

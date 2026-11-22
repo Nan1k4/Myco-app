@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -41,36 +41,49 @@ export function BottomPanel({
   const sheetHeight = useSharedValue(360);
   const canDismiss = backdrop && Boolean(onDismiss);
   const bottomPadding = SPACE.l + (withBottomInset ? insets.bottom : 0);
+  const onDismissRef = useRef(onDismiss);
+
+  useEffect(() => {
+    onDismissRef.current = onDismiss;
+  }, [onDismiss]);
+
+  const triggerDismiss = useCallback(() => {
+    onDismissRef.current?.();
+  }, []);
 
   const handleLayout = (event: LayoutChangeEvent) => {
     sheetHeight.value = Math.max(1, event.nativeEvent.layout.height);
   };
 
-  const pan = Gesture.Pan()
-    .enabled(canDismiss)
-    .activeOffsetY(12)
-    .failOffsetX([-24, 24])
-    .onUpdate((event) => {
-      translateY.value = Math.max(0, event.translationY);
-    })
-    .onEnd((event) => {
-      const shouldDismiss = event.translationY > DISMISS_DISTANCE || event.velocityY > DISMISS_VELOCITY;
-      if (shouldDismiss && onDismiss) {
-        if (reduceMotion) {
-          runOnJS(onDismiss)();
-          return;
-        }
-        translateY.value = withTiming(
-          sheetHeight.value,
-          { duration: MOTION.fast, easing: Easing.out(Easing.cubic) },
-          (finished) => {
-            if (finished) runOnJS(onDismiss)();
-          },
-        );
-        return;
-      }
-      translateY.value = reduceMotion ? 0 : withSpring(0, { damping: 24, stiffness: 340 });
-    });
+  const pan = useMemo(
+    () =>
+      Gesture.Pan()
+        .enabled(canDismiss)
+        .activeOffsetY(12)
+        .failOffsetX([-24, 24])
+        .onUpdate((event) => {
+          translateY.value = Math.max(0, event.translationY);
+        })
+        .onEnd((event) => {
+          const shouldDismiss = event.translationY > DISMISS_DISTANCE || event.velocityY > DISMISS_VELOCITY;
+          if (shouldDismiss && canDismiss) {
+            if (reduceMotion) {
+              runOnJS(triggerDismiss)();
+              return;
+            }
+            translateY.value = withTiming(
+              sheetHeight.value,
+              { duration: MOTION.fast, easing: Easing.out(Easing.cubic) },
+              (finished) => {
+                if (finished) runOnJS(triggerDismiss)();
+              },
+            );
+            return;
+          }
+          translateY.value = reduceMotion ? 0 : withSpring(0, { damping: 24, stiffness: 340 });
+        }),
+    [canDismiss, reduceMotion, sheetHeight, translateY, triggerDismiss],
+  );
 
   const dragStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],

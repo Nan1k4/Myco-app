@@ -48,7 +48,6 @@ export function FeatureQuestion<K extends QuizFeatureKey>({
   frame,
 }: FeatureQuestionProps<K>) {
   const [pending, setPending] = useState<FeatureValueMap[K] | null>(current?.value ?? null);
-  const needsCertainty = canConfirmIn(featureKey, stage);
 
   const options = useMemo(() => {
     const { likely, other } = orderedOptions(featureKey, pool);
@@ -59,12 +58,16 @@ export function FeatureQuestion<K extends QuizFeatureKey>({
   }, [featureKey, pool]);
 
   const choose = (value: FeatureValueMap[K]) => {
-    if (needsCertainty) setPending(value);
-    else onAnswer(answerFeature(featureKey, { value, certainty: 'uncertain' }, stage));
+    if (canConfirmIn(featureKey, stage, value)) {
+      setPending(value);
+    } else {
+      setPending(null);
+      onAnswer(answerFeature(featureKey, { value, certainty: 'uncertain' }, stage));
+    }
   };
 
   const footer =
-    needsCertainty && pending !== null ? (
+    pending !== null && canConfirmIn(featureKey, stage, pending) ? (
       <CertaintyStep
         procedures={requiredProcedures(featureKey, pending)}
         onAnswer={(certainty) => onAnswer(answerFeature(featureKey, { value: pending, certainty }, stage))}

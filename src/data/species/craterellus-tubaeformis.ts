@@ -57,7 +57,7 @@ export const craterellusTubaeformis: Mushroom = {
   dangerousLookalikes: [
     {
       mushroomId: mushroomId('galerina-marginata'),
-      distinguishingFeatures: ['hymenophore', 'ring', 'sporePrint'],
+      distinguishingFeatures: ['hymenophore', 'sporePrint'],
       note: 'Hełmówka obrzeżona (śmiertelnie trująca - amatoksyny) rośnie na butwiejącym drewnie, ma prawdziwe blaszki, często resztki pierścienia i rdzawobrązowy wysyp; pieprznik trąbkowy ma żyłkowate listewki zbiegające na trzon, brak pierścienia i biały wysyp.',
     },
   ],

@@ -54,7 +54,7 @@ const FIXTURE_DB = testDatabase([
   testSpecies(
     'Amanita phalloides',
     DEADLY,
-    { hymenophore: ['gills'], capColor: ['green'] },
+    { hymenophore: ['gills'], capColor: ['green'], ring: ['membranous_skirt', 'none'] },
     { polishName: 'Muchomor zielonawy', vernacularNames: ['sromotnik'], fruiting: fruitingMonths([8, 9, 10]) },
   ),
   testSpecies(
@@ -148,7 +148,7 @@ describe('queryAtlas', () => {
     expect(names(dangerous.slice(0, 2))).toEqual(['Hełmówka jadowita', 'Muchomor zielonawy']);
   });
 
-  it('activeFilterCount liczy opcje, zakres i „teraz”', () => {
+  it('activeFilterCount liczy opcje, zakres i „teraz” oraz pogodę zależnie od weatherAvailable', () => {
     expect(
       activeFilterCount({
         facets: { capColor: ['red', 'brown'] },
@@ -157,5 +157,44 @@ describe('queryAtlas', () => {
         favorableWeather: false,
       }),
     ).toBe(4);
+
+    const withWeather: AtlasFilters = {
+      facets: {},
+      months: null,
+      inSeasonNow: false,
+      favorableWeather: true,
+    };
+    expect(activeFilterCount(withWeather, true)).toBe(1);
+    expect(activeFilterCount(withWeather, false)).toBe(0);
+  });
+
+  it('filtr „Brak pierścienia” (ring: none) w Atlasie wyklucza gatunki mające także inny typ pierścienia', () => {
+    const noRing = run({ filters: withFacets({ ring: ['none'] }) });
+    expect(names(noRing.species)).not.toContain('Muchomor zielonawy');
+    expect(noRing.counts.ring.none).toBe(FIXTURE_DB.species.length - 1);
+    expect(noRing.counts.ring.membranous_skirt).toBe(1);
+
+    const skirt = run({ filters: withFacets({ ring: ['membranous_skirt'] }) });
+    expect(names(skirt.species)).toEqual(['Muchomor zielonawy']);
+
+    const either = run({ filters: withFacets({ ring: ['none', 'membranous_skirt'] }) });
+    expect(either.species.length).toBe(FIXTURE_DB.species.length);
+  });
+
+  it('filtr ochrony: niechronione oraz oba wybory łącznie', () => {
+    const db = testDatabase([
+      testSpecies('Boletus edulis', EDIBLE, { hymenophore: ['tubes'] }, { polishName: 'Borowik szlachetny', legallyProtected: false }),
+      testSpecies('Butyriboletus regius', EDIBLE, { hymenophore: ['tubes'] }, { polishName: 'Borowik królewski', legallyProtected: true }),
+    ]);
+    const localIndex = buildAtlasIndex(db);
+    const protectedRes = queryAtlas(localIndex, { filters: withFacets({ legal: ['protected'] }), sort: 'alpha', search: '', currentMonth: 9 });
+    expect(names(protectedRes.species)).toEqual(['Borowik królewski']);
+
+    const unprotectedRes = queryAtlas(localIndex, { filters: withFacets({ legal: ['unprotected'] }), sort: 'alpha', search: '', currentMonth: 9 });
+    expect(names(unprotectedRes.species)).toEqual(['Borowik szlachetny']);
+    expect(unprotectedRes.counts.legal).toEqual({ unprotected: 1, protected: 1 });
+
+    const bothRes = queryAtlas(localIndex, { filters: withFacets({ legal: ['protected', 'unprotected'] }), sort: 'alpha', search: '', currentMonth: 9 });
+    expect(bothRes.species.length).toBe(2);
   });
 });

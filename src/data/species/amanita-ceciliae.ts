@@ -63,13 +63,13 @@ export const amanitaCeciliae: Mushroom = {
   dangerousLookalikes: [
     {
       mushroomId: mushroomId('amanita-pantherina'),
-      distinguishingFeatures: ['ring', 'capSurface', 'volva'],
-      note: 'Plamisty ma pierścień, białe brodawki i bulwę z ostrym obrzeżeniem; złotawy - brak pierścienia, szare łatki, szare pierścienie resztek u podstawy.',
+      distinguishingFeatures: ['stipeBase', 'stipeSurface'],
+      note: 'Plamisty ma pierścień, białe brodawki i bulwę z ostrym obrzeżeniem; złotawy - brak pierścienia, szare łatki, bez bulwy, prążkowany trzon i szare pierścienie resztek pochwy u podstawy.',
     },
     {
       mushroomId: mushroomId('amanita-phalloides'),
-      distinguishingFeatures: ['ring', 'capMargin', 'volva'],
-      note: 'Sromotnikowy ma pierścień, gładki (nieprążkowany) brzeg kapelusza i białą workowatą pochwę. Pierścień może odpaść - sprawdzaj wszystkie cechy.',
+      distinguishingFeatures: ['capMargin', 'stipeBase', 'capSurface'],
+      note: 'Sromotnikowy ma pierścień, bulwę u podstawy, gładki (nieprążkowany) brzeg kapelusza i białą workowatą pochwę. Pierścień może odpaść - sprawdzaj wszystkie cechy.',
     },
   ],
   legallyProtected: false,

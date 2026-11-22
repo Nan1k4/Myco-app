@@ -1,5 +1,5 @@
 /**
- * @file Lista wszystkich gatunków. PLIK GENEROWANY
+ * @file Lista wszystkich gatunków. PLIK GENEROWANY – nie edytuj ręcznie.
  * Po dodaniu, usunięciu lub zmianie nazwy pliku gatunku: `node scripts/generate-species-index.mjs`.
  * @module data/species
  */
@@ -50,28 +50,37 @@ import { calocybeGambosa } from './calocybe-gambosa';
 import { calvatiaGigantea } from './calvatia-gigantea';
 import { cantharellusCibarius } from './cantharellus-cibarius';
 import { chalciporusPiperatus } from './chalciporus-piperatus';
+import { chlorophyllumBrunneum } from './chlorophyllum-brunneum';
 import { chlorophyllumRhacodes } from './chlorophyllum-rhacodes';
 import { clitocybeNebularis } from './clitocybe-nebularis';
+import { coprinopsisAtramentaria } from './coprinopsis-atramentaria';
 import { coprinusComatus } from './coprinus-comatus';
 import { cortinariusCaperatus } from './cortinarius-caperatus';
+import { cortinariusOrellanus } from './cortinarius-orellanus';
 import { cortinariusRubellus } from './cortinarius-rubellus';
+import { cortinariusTraganus } from './cortinarius-traganus';
 import { craterellusCornucopioides } from './craterellus-cornucopioides';
 import { craterellusTubaeformis } from './craterellus-tubaeformis';
+import { entolomaSinuatum } from './entoloma-sinuatum';
 import { flammulinaVelutipes } from './flammulina-velutipes';
 import { fomesFomentarius } from './fomes-fomentarius';
 import { fomitopsisBetulina } from './fomitopsis-betulina';
 import { fomitopsisPinicola } from './fomitopsis-pinicola';
 import { galerinaMarginata } from './galerina-marginata';
 import { gymnopusDryophilus } from './gymnopus-dryophilus';
+import { gymnopusPeronatus } from './gymnopus-peronatus';
 import { gyroporusCastaneus } from './gyroporus-castaneus';
 import { gyroporusCyanescens } from './gyroporus-cyanescens';
 import { harryaChromapes } from './harrya-chromapes';
+import { hebelomaCrustuliniforme } from './hebeloma-crustuliniforme';
 import { hemileccinumImpolitum } from './hemileccinum-impolitum';
 import { hortiboletusRubellus } from './hortiboletus-rubellus';
 import { hydnumRepandum } from './hydnum-repandum';
 import { hygrophoropsisAurantiaca } from './hygrophoropsis-aurantiaca';
 import { hypholomaFasciculare } from './hypholoma-fasciculare';
 import { imleriaBadia } from './imleria-badia';
+import { inocybeErubescens } from './inocybe-erubescens';
+import { inocybeGeophylla } from './inocybe-geophylla';
 import { kuehneromycesMutabilis } from './kuehneromyces-mutabilis';
 import { laccariaAmethystina } from './laccaria-amethystina';
 import { laccariaLaccata } from './laccaria-laccata';
@@ -91,12 +100,14 @@ import { leccinumHolopus } from './leccinum-holopus';
 import { leccinumScabrum } from './leccinum-scabrum';
 import { leccinumVersipelle } from './leccinum-versipelle';
 import { leccinumVulpinum } from './leccinum-vulpinum';
+import { lepiotaBrunneoincarnata } from './lepiota-brunneoincarnata';
 import { lepistaNuda } from './lepista-nuda';
 import { lycoperdonPerlatum } from './lycoperdon-perlatum';
 import { macrolepiotaProcera } from './macrolepiota-procera';
 import { mycenaGalericulata } from './mycena-galericulata';
 import { mycenaPura } from './mycena-pura';
 import { neoboletusLuridiformis } from './neoboletus-luridiformis';
+import { omphalotusOlearius } from './omphalotus-olearius';
 import { paxillusInvolutus } from './paxillus-involutus';
 import { phallusImpudicus } from './phallus-impudicus';
 import { pholiotaSquarrosa } from './pholiota-squarrosa';
@@ -142,6 +153,8 @@ import { suillusPlacidus } from './suillus-placidus';
 import { suillusVariegatus } from './suillus-variegatus';
 import { suillusViscidus } from './suillus-viscidus';
 import { trametesVersicolor } from './trametes-versicolor';
+import { tricholomaEquestre } from './tricholoma-equestre';
+import { tricholomaPardinum } from './tricholoma-pardinum';
 import { tricholomaPortentosum } from './tricholoma-portentosum';
 import { tricholomaSaponaceum } from './tricholoma-saponaceum';
 import { tricholomaSulphureum } from './tricholoma-sulphureum';
@@ -199,28 +212,37 @@ export const ALL_SPECIES: readonly Mushroom[] = [
   calvatiaGigantea,
   cantharellusCibarius,
   chalciporusPiperatus,
+  chlorophyllumBrunneum,
   chlorophyllumRhacodes,
   clitocybeNebularis,
+  coprinopsisAtramentaria,
   coprinusComatus,
   cortinariusCaperatus,
+  cortinariusOrellanus,
   cortinariusRubellus,
+  cortinariusTraganus,
   craterellusCornucopioides,
   craterellusTubaeformis,
+  entolomaSinuatum,
   flammulinaVelutipes,
   fomesFomentarius,
   fomitopsisBetulina,
   fomitopsisPinicola,
   galerinaMarginata,
   gymnopusDryophilus,
+  gymnopusPeronatus,
   gyroporusCastaneus,
   gyroporusCyanescens,
   harryaChromapes,
+  hebelomaCrustuliniforme,
   hemileccinumImpolitum,
   hortiboletusRubellus,
   hydnumRepandum,
   hygrophoropsisAurantiaca,
   hypholomaFasciculare,
   imleriaBadia,
+  inocybeErubescens,
+  inocybeGeophylla,
   kuehneromycesMutabilis,
   laccariaAmethystina,
   laccariaLaccata,
@@ -240,12 +262,14 @@ export const ALL_SPECIES: readonly Mushroom[] = [
   leccinumScabrum,
   leccinumVersipelle,
   leccinumVulpinum,
+  lepiotaBrunneoincarnata,
   lepistaNuda,
   lycoperdonPerlatum,
   macrolepiotaProcera,
   mycenaGalericulata,
   mycenaPura,
   neoboletusLuridiformis,
+  omphalotusOlearius,
   paxillusInvolutus,
   phallusImpudicus,
   pholiotaSquarrosa,
@@ -291,6 +315,8 @@ export const ALL_SPECIES: readonly Mushroom[] = [
   suillusVariegatus,
   suillusViscidus,
   trametesVersicolor,
+  tricholomaEquestre,
+  tricholomaPardinum,
   tricholomaPortentosum,
   tricholomaSaponaceum,
   tricholomaSulphureum,

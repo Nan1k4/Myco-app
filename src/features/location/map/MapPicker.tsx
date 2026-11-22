@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, Linking, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 import { APP_USER_AGENT } from '../../../appInfo';
 import { Button } from '../../../components/Button';
@@ -38,6 +39,7 @@ const ERROR_TEXT = {
 } as const;
 
 function MapPickerContent({ initialCoords, onCancel, onConfirm }: Omit<MapPickerProps, 'visible'>) {
+  const insets = useSafeAreaInsets();
   const [picked, setPicked] = useState<GeoCoordinates | null>(initialCoords);
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [tilesFailing, setTilesFailing] = useState(false);
@@ -75,7 +77,7 @@ function MapPickerContent({ initialCoords, onCancel, onConfirm }: Omit<MapPicker
 
   return (
     <View style={styles.screen}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + SPACE.xs }]}>
         <Pressable onPress={onCancel} accessibilityRole="button" accessibilityLabel="Anuluj" style={styles.closeBtn}>
           <Icon name="close" size={22} color={COLORS.text} />
         </Pressable>
@@ -108,7 +110,7 @@ function MapPickerContent({ initialCoords, onCancel, onConfirm }: Omit<MapPicker
         ) : null}
       </View>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: SPACE.l + insets.bottom }]}>
         {errorText ? (
           <StatusBanner tone="warning" message={errorText} action={{ label: 'Spróbuj ponownie', onPress: retry }} />
         ) : null}

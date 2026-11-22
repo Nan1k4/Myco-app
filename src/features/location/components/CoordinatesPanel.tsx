@@ -15,13 +15,24 @@ interface CoordinatesPanelProps {
   readonly onSelect: (place: NamedPlace) => void;
 }
 
+interface SwapState {
+  readonly original: NamedPlace;
+  readonly swapped: NamedPlace;
+}
+
 export function CoordinatesPanel({ onSelect }: CoordinatesPanelProps) {
   const [text, setText] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [swapCandidate, setSwapCandidate] = useState<NamedPlace | null>(null);
+  const [swapState, setSwapState] = useState<SwapState | null>(null);
+
+  const confirmPlace = (place: NamedPlace) => {
+    setError(null);
+    setSwapState(null);
+    onSelect(place);
+  };
 
   const submit = () => {
-    setSwapCandidate(null);
+    setSwapState(null);
     const parsed = parseCoordinates(text);
     if (!parsed.ok) {
       setError(ERRORS[parsed.reason]);
@@ -30,11 +41,13 @@ export function CoordinatesPanel({ onSelect }: CoordinatesPanelProps) {
     if (looksSwapped(parsed.coords)) {
       const { latitude, longitude } = parsed.coords;
       setError('Kolejność wygląda na odwróconą: dla Polski szerokość (49-55) podaje się jako pierwszą.');
-      setSwapCandidate(placeFromCoordinates({ latitude: longitude, longitude: latitude }, 'współrzędne'));
+      setSwapState({
+        original: placeFromCoordinates(parsed.coords, 'współrzędne'),
+        swapped: placeFromCoordinates({ latitude: longitude, longitude: latitude }, 'współrzędne'),
+      });
       return;
     }
-    setError(null);
-    onSelect(placeFromCoordinates(parsed.coords, 'współrzędne'));
+    confirmPlace(placeFromCoordinates(parsed.coords, 'współrzędne'));
   };
 
   return (
@@ -45,7 +58,7 @@ export function CoordinatesPanel({ onSelect }: CoordinatesPanelProps) {
         onChangeText={(value) => {
           setText(value);
           setError(null);
-          setSwapCandidate(null);
+          setSwapState(null);
         }}
         onSubmitEditing={submit}
         placeholder="52.2297, 21.0122"
@@ -57,9 +70,10 @@ export function CoordinatesPanel({ onSelect }: CoordinatesPanelProps) {
       <Button label="Użyj współrzędnych" icon="navigate-outline" onPress={submit} />
       {error ? (
         <StatusBanner
-          tone={swapCandidate ? 'warning' : 'danger'}
+          tone={swapState ? 'warning' : 'danger'}
           message={error}
-          action={swapCandidate ? { label: `Zamień i użyj ${swapCandidate.name}`, onPress: () => onSelect(swapCandidate) } : undefined}
+          action={swapState ? { label: `Zamień i użyj ${swapState.swapped.name}`, onPress: () => confirmPlace(swapState.swapped) } : undefined}
+          secondaryAction={swapState ? { label: 'Użyj mimo to', onPress: () => confirmPlace(swapState.original) } : undefined}
         />
       ) : null}
     </View>

@@ -96,6 +96,15 @@ function EdibilityNotice({ mushroom }: { readonly mushroom: Mushroom }) {
       />
     );
   }
+  if (edibility.category === 'unknown') {
+    return (
+      <StatusBanner
+        tone="warning"
+        title="Jadalność nieznana"
+        message={`Nie zbieraj i nie spożywaj — gatunek o nieustalonej jadalności.${edibility.notes ? ` ${edibility.notes}` : ''}`}
+      />
+    );
+  }
   if (edibility.category === 'conditionally_edible') {
     const { requiresCooking, alcoholInteraction, youngSpecimensOnly, notes } = edibility.conditions;
     const parts = [

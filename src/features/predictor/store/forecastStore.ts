@@ -102,6 +102,9 @@ export function createForecastStore(deps: ForecastStoreDeps): ForecastStore {
   let writeChain: Promise<void> = Promise.resolve();
   let staleRunActive = false;
   let customGeneration = 0;
+  let customPlaceDirty = false;
+  let pendingPersist = false;
+  const removedPlaceIds = new Set<SavedPlaceId>();
 
   const setState = (update: (current: ForecastState) => ForecastState) => {
     state = update(state);
@@ -122,6 +125,11 @@ export function createForecastStore(deps: ForecastStoreDeps): ForecastStore {
   };
 
   const persist = () => {
+    if (!state.hydrated) {
+      pendingPersist = true;
+      void hydrate();
+      return;
+    }
     const forecasts: Record<string, StoredForecast> = {};
     for (const [key, entry] of Object.entries(state.entries)) {
       if (entry.stored) forecasts[key] = entry.stored;
@@ -141,9 +149,37 @@ export function createForecastStore(deps: ForecastStoreDeps): ForecastStore {
         deps.onPersistError?.(error);
       }
       const stored = decodeStoredState(raw);
-      const entries: Record<string, ForecastEntry> = {};
-      for (const [key, forecast] of Object.entries(stored.forecasts)) entries[key] = { stored: forecast, status: IDLE };
-      setState((s) => ({ ...s, hydrated: true, places: stored.places, customPlace: stored.customPlace, entries }));
+      setState((s) => {
+        const survivingStored = stored.places.filter((p) => !removedPlaceIds.has(p.id));
+        const survivingIds = new Set(survivingStored.map((p) => p.id));
+        const preAdded = s.places.filter((p) => !removedPlaceIds.has(p.id) && !survivingIds.has(p.id));
+        const places = [...survivingStored, ...preAdded].slice(0, MAX_SAVED_PLACES);
+        const customPlace = customPlaceDirty ? s.customPlace : stored.customPlace;
+
+        const validKeys = new Set<string>([DEVICE_KEY, ...places.map((p) => p.id)]);
+        if (customPlace) validKeys.add(CUSTOM_KEY);
+
+        const entries: Record<string, ForecastEntry> = {};
+        for (const [key, forecast] of Object.entries(stored.forecasts)) {
+          if (!validKeys.has(key)) continue;
+          if (key === CUSTOM_KEY && customPlaceDirty) continue;
+          entries[key] = { stored: forecast, status: IDLE };
+        }
+        if (customPlaceDirty && customPlace && s.entries[CUSTOM_KEY]) {
+          entries[CUSTOM_KEY] = s.entries[CUSTOM_KEY];
+        }
+        for (const place of preAdded) {
+          const entry = s.entries[place.id];
+          if (entry && validKeys.has(place.id)) entries[place.id] = entry;
+        }
+
+        return { ...s, hydrated: true, places, customPlace, entries };
+      });
+      removedPlaceIds.clear();
+      if (pendingPersist) {
+        pendingPersist = false;
+        persist();
+      }
     })();
     return hydration;
   };
@@ -204,16 +240,6 @@ export function createForecastStore(deps: ForecastStoreDeps): ForecastStore {
     }
   };
 
-  const refreshBatch = async (keys: readonly ForecastKey[]): Promise<void> => {
-    if (staleRunActive) return;
-    staleRunActive = true;
-    try {
-      for (const key of keys) await refresh(key);
-    } finally {
-      staleRunActive = false;
-    }
-  };
-
   const nonDeviceKeys = (): ForecastKey[] => {
     const keys: ForecastKey[] = state.places.map((place) => place.id);
     if (state.customPlace) keys.unshift(CUSTOM_KEY);
@@ -221,22 +247,34 @@ export function createForecastStore(deps: ForecastStoreDeps): ForecastStore {
   };
 
   const refreshStale = async (maxAgeMs: number): Promise<void> => {
-    await hydrate();
-    const nowMs = deps.now().getTime();
-    const isStale = (key: string) => {
-      const fetchedAt = state.entries[key]?.stored?.snapshot.fetchedAt;
-      return fetchedAt === undefined || nowMs - Date.parse(fetchedAt) > maxAgeMs;
-    };
-    await refreshBatch(nonDeviceKeys().filter(isStale));
+    if (staleRunActive) return;
+    staleRunActive = true;
+    try {
+      await hydrate();
+      const nowMs = deps.now().getTime();
+      const isStale = (key: string) => {
+        const fetchedAt = state.entries[key]?.stored?.snapshot.fetchedAt;
+        return fetchedAt === undefined || nowMs - Date.parse(fetchedAt) > maxAgeMs;
+      };
+      for (const key of nonDeviceKeys().filter(isStale)) {
+        if (isStale(key)) await refresh(key);
+      }
+    } finally {
+      staleRunActive = false;
+    }
   };
 
   const refreshAll = async (): Promise<void> => {
     await hydrate();
-    await refreshBatch([DEVICE_KEY, ...nonDeviceKeys()]);
+    const keys: readonly ForecastKey[] = [DEVICE_KEY, ...nonDeviceKeys()];
+    for (const key of keys) {
+      await refresh(key);
+    }
   };
 
   const checkPlace = (place: NamedPlace) => {
     customGeneration += 1;
+    if (!state.hydrated) customPlaceDirty = true;
     setState((s) => ({ ...s, customPlace: place, entries: { ...s.entries, [CUSTOM_KEY]: LOADING_ENTRY } }));
     persist();
     void refresh(CUSTOM_KEY);
@@ -244,6 +282,7 @@ export function createForecastStore(deps: ForecastStoreDeps): ForecastStore {
 
   const clearCustomPlace = () => {
     customGeneration += 1;
+    if (!state.hydrated) customPlaceDirty = true;
     setState((s) => ({ ...s, customPlace: null, entries: withoutEntry(s.entries, CUSTOM_KEY) }));
     persist();
   };
@@ -265,7 +304,10 @@ export function createForecastStore(deps: ForecastStoreDeps): ForecastStore {
 
     const fromCustom = state.customPlace !== null && sameWeatherCell(state.customPlace.coords, place.coords);
     const reusable = fromCustom ? state.entries[CUSTOM_KEY]?.stored : undefined;
-    if (fromCustom) customGeneration += 1;
+    if (fromCustom) {
+      customGeneration += 1;
+      if (!state.hydrated) customPlaceDirty = true;
+    }
 
     setState((s) => {
       const entries: Record<string, ForecastEntry> = fromCustom ? withoutEntry(s.entries, CUSTOM_KEY) : { ...s.entries };
@@ -280,6 +322,12 @@ export function createForecastStore(deps: ForecastStoreDeps): ForecastStore {
   };
 
   const removePlace = (id: SavedPlaceId) => {
+    if (!state.hydrated) {
+      removedPlaceIds.add(id);
+      setState((s) => ({ ...s, places: s.places.filter((p) => p.id !== id), entries: withoutEntry(s.entries, id) }));
+      persist();
+      return;
+    }
     if (!findPlace(id)) return;
     setState((s) => ({ ...s, places: s.places.filter((p) => p.id !== id), entries: withoutEntry(s.entries, id) }));
     persist();

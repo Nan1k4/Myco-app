@@ -57,7 +57,7 @@ export const agaricusArvensis: Mushroom = {
   dangerousLookalikes: [
     {
       mushroomId: mushroomId('agaricus-xanthodermus'),
-      distinguishingFeatures: ['bruising', 'stipeFleshColorChange'],
+      distinguishingFeatures: ['stipeFleshColorChange'],
       note: 'Pieczarka żółtawa (trująca - dolegliwości żołądkowo-jelitowe) pachnie fenolem lub atramentem, a u nasady trzonu po przekrojeniu intensywnie żółknie; pieczarka biaława pachnie anyżkiem.',
     },
     {

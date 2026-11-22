@@ -57,7 +57,7 @@ export const russulaCyanoxantha: Mushroom = {
   dangerousLookalikes: [
     {
       mushroomId: mushroomId('amanita-phalloides'),
-      distinguishingFeatures: ['ring', 'volva', 'stipeBase'],
+      distinguishingFeatures: ['volva', 'stipeBase'],
       note: 'Zielonawy kapelusz bywa mylony z muchomorem zielonawym. Muchomor ma pierścień, białą pochwę i bulwę u nasady trzonu, a miąższ kruchy gołąbka jest bez tych cech. Gołąbek ma elastyczne, tłuste blaszki i łamliwy, kredowy trzon.',
     },
   ],

@@ -14,7 +14,10 @@ function resolveDbFiles(): {
   readonly sidecars: readonly File[];
 } {
   const dir = new Directory(Paths.document, 'SQLite');
-  const sqliteDir = dir.uri.replace(/^file:\/\//, '').replace(/\/$/, '');
+  // Przekazujemy pełne file:// URI (bez ręcznego decodeURIComponent), ponieważ zarówno Android
+  // (databasePath.toUri().path), jak i iOS (DatabaseFileUtils.fileURL) dekodują je dokładnie raz —
+  // podwójne dekodowanie psuje katalogi zawierające dosłowne "%40"/"%2F" (np. ExperienceData w Expo Go).
+  const sqliteDir = dir.uri.replace(/\/$/, '');
   const dbFile = new File(dir, DB_NAME);
   const sidecars = [new File(dir, `${DB_NAME}-wal`), new File(dir, `${DB_NAME}-shm`)];
   return { dir, sqliteDir, dbFile, sidecars };
@@ -46,12 +49,6 @@ async function copyBundledDatabase(
     dir.create({ intermediates: true, idempotent: true });
   }
 
-  for (const file of [dbFile, ...sidecars]) {
-    if (file.exists) {
-      file.delete();
-    }
-  }
-
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const asset = Asset.fromModule(require('../../assets/db/myco.db'));
   await asset.downloadAsync();
@@ -60,7 +57,30 @@ async function copyBundledDatabase(
     throw new Error(`Nie udało się pobrać lokalnego zasobu ${DB_NAME}.`);
   }
 
-  new File(asset.localUri).copy(dbFile);
+  const tmpFile = new File(dir, `${DB_NAME}.tmp`);
+  try {
+    if (tmpFile.exists) {
+      tmpFile.delete();
+    }
+    await new File(asset.localUri).copy(tmpFile, { overwrite: true });
+
+    for (const file of [dbFile, ...sidecars]) {
+      if (file.exists) {
+        file.delete();
+      }
+    }
+
+    await tmpFile.move(dbFile, { overwrite: true });
+  } catch (error) {
+    if (tmpFile.exists) {
+      try {
+        tmpFile.delete();
+      } catch {
+        // Ignoruj błąd czyszczenia pliku tymczasowego, aby zachować pierwotny wyjątek.
+      }
+    }
+    throw error;
+  }
 }
 
 async function bootstrapDatabase(): Promise<SQLite.SQLiteDatabase> {

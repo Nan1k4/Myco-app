@@ -45,23 +45,41 @@ describe('quizReducer', () => {
     expect([...state.reopened].sort()).toEqual(['cut', 'dig_base', 'spore_print']);
   });
 
-  it('„Tylko to pytanie” pomija jedno i zapamiętuje etap (bez ponownej propozycji pominięcia etapu)', () => {
+  it('„Tylko to pytanie” pomija jedno i zapamiętuje etap; „Wstecz” przywraca propozycję etapu', () => {
     const state = run([{ type: 'start' }, { type: 'skip_single', key: 'latex', stage: 'touch' }]);
     expect([...state.skipped]).toEqual([['latex', 'touch']]);
     expect(state.singleSkipStages.has('touch')).toBe(true);
+    expect(quizReducer(state, { type: 'undo' }).singleSkipStages.has('touch')).toBe(false);
     expect(quizReducer(state, { type: 'reset' }).singleSkipStages.size).toBe(0);
   });
 
-  it('powrót z podsumowania przypina pytanie w etapie i zdejmuje je z pominiętych', () => {
-    const state = run([
+  it('powrót do pominiętego zapisuje checkpoint i nie kasuje pominięcia przed odpowiedzią', () => {
+    const beforeRevisit = run([
       { type: 'start' },
+      answerSubstrate('wood'),
       { type: 'skip', key: 'volva', stage: 'dig_base' },
       { type: 'show_results' },
-      { type: 'revisit', key: 'volva', stage: 'dig_base' },
     ]);
-    expect(state.phase).toBe('questions');
-    expect(state.pinned).toEqual({ key: 'volva', stage: 'dig_base' });
-    expect(state.skipped.has('volva')).toBe(false);
+    const revisited = quizReducer(beforeRevisit, { type: 'revisit', key: 'volva', stage: 'dig_base' });
+    expect(revisited.phase).toBe('questions');
+    expect(revisited.pinned).toEqual({ key: 'volva', stage: 'dig_base' });
+    expect(revisited.skipped.has('volva')).toBe(true);
+    expect(revisited.history.length).toBe(beforeRevisit.history.length + 1);
+
+    // Rezygnacja i powrót do wyników nie gubi pytania z listy pominiętych.
+    const backToResults = quizReducer(revisited, { type: 'show_results' });
+    expect(backToResults.skipped.has('volva')).toBe(true);
+
+    // „Wstecz” po revisit odpina pytanie, nie cofając wcześniejszej odpowiedzi (substrate).
+    const undone = quizReducer(revisited, { type: 'undo' });
+    expect(undone.pinned).toBeNull();
+    expect(undone.selections.substrate).toBe('wood');
+    expect(undone.skipped.has('volva')).toBe(true);
+
+    // Dopiero odpowiedź usuwa klucz z pominiętych.
+    const answered = quizReducer(revisited, answerFeature('volva', { value: 'present', certainty: 'certain' }, 'dig_base'));
+    expect(answered.skipped.has('volva')).toBe(false);
+    expect(answered.pinned).toBeNull();
   });
 
   it('próg jest normalizowany i przeżywa reset', () => {

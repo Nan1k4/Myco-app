@@ -27,6 +27,8 @@ export type QuizDirection = 'forward' | 'back';
 /** Część stanu cofana przez „Wstecz”. Próg i faza nie są historią odpowiedzi. */
 interface QuizProgress extends QuizProgressView {
   readonly pinned: QuizPin | null;
+  /** Etapy, w których użytkownik wybrał „Tylko to pytanie” – nie proponujemy mu już pominięcia etapu. */
+  readonly singleSkipStages: ReadonlySet<QuizStage>;
 }
 
 export interface QuizState extends QuizProgress {
@@ -34,8 +36,6 @@ export interface QuizState extends QuizProgress {
   /** [0,5; 1], krok 0,05. Dotyczy wyłącznie listy częściowych dopasowań. */
   readonly threshold: number;
   readonly direction: QuizDirection;
-  /** Etapy, w których użytkownik wybrał „Tylko to pytanie” – nie proponujemy mu już pominięcia etapu. */
-  readonly singleSkipStages: ReadonlySet<QuizStage>;
   readonly history: readonly QuizProgress[];
 }
 
@@ -123,11 +123,10 @@ export function quizReducer(state: QuizState, action: QuizAction): QuizState {
       return { ...state, phase: 'questions', direction: 'back' };
     case 'revisit':
       return {
-        ...state,
+        ...withCheckpoint(state),
         phase: 'questions',
         direction: 'forward',
         pinned: { key: action.key, stage: action.stage },
-        skipped: without(state.skipped, action.key),
       };
     case 'revisit_stage': {
       const { stage } = action;
@@ -176,8 +175,11 @@ export function answerTrees(trees: NonEmptyArray<TreeGenus>): QuizAction {
 /* -------------------------------- Narzędzia -------------------------------- */
 
 function withCheckpoint(state: QuizState): QuizState {
-  const { selections, skipped, skippedStages, reopened, answeredIn, pinned } = state;
-  return { ...state, history: [...state.history, { selections, skipped, skippedStages, reopened, answeredIn, pinned }] };
+  const { selections, skipped, skippedStages, reopened, answeredIn, pinned, singleSkipStages } = state;
+  return {
+    ...state,
+    history: [...state.history, { selections, skipped, skippedStages, reopened, answeredIn, pinned, singleSkipStages }],
+  };
 }
 
 function without(log: SkipLog, key: QuizKey): SkipLog {

@@ -95,6 +95,7 @@ export function PresetBar({ presets, canSave, onApply, onSave, onDelete }: Prese
             returnKeyType="done"
             style={[styles.input, error && styles.inputError]}
           />
+          <FieldError message={error} />
           <Button label="Zapisz" onPress={save} />
           <Button label="Anuluj" variant="plain" onPress={cancel} />
         </View>

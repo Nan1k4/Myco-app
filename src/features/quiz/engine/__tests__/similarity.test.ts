@@ -2,7 +2,7 @@ import { COLORS, FEATURE_VOCABULARIES, type FeatureSelections, type FilterSelect
 import { DEADLY, EDIBLE, testDatabase, testSpecies } from '../../../../domain/__fixtures__/testSpecies';
 import { buildFilterIndex } from '../../../filter/engine';
 import { COLOR_NEIGHBOURS, TOLERANT_FEATURES } from '../nearValues';
-import { THRESHOLD, normalizeThreshold, rankBySimilarity } from '../similarity';
+import { THRESHOLD, normalizeThreshold, rankBySimilarity, revealHiddenDangerous, thresholdToReveal } from '../similarity';
 
 const edulis = testSpecies('Testus edulis', EDIBLE, { capColor: ['brown'], ring: ['membranous_skirt', 'none'] });
 const similis = testSpecies('Testus similis', EDIBLE, { capColor: ['white'], stipeInterior: ['hollow'] });
@@ -124,5 +124,44 @@ describe('rankBySimilarity', () => {
   it('otoczenie liczy się tylko tam, gdzie jest dowodem (drzewa – tylko gatunki wyłącznie mikoryzowe)', () => {
     const r = rank({}, 0.5, { trees: ['pinus'], substrate: 'ground' });
     expect(r.exact.every((e) => e.considered === 1)).toBe(true); // tylko podłoże; testowe gatunki są saprotrofami
+  });
+});
+
+describe('ukryte gatunki trujące (poniżej i powyżej 50%)', () => {
+  it('thresholdToReveal zwraca próg do obniżenia tylko wtedy, gdy suwak może odsłonić wszystkie ukryte', () => {
+    const features65: FeatureSelections = {
+      volva: { value: 'absent', certainty: 'uncertain' }, // 0.6 (0)
+      capColor: { value: 'white', certainty: 'uncertain' }, // 0.3 (1)
+      sporePrint: { value: 'white', certainty: 'certain' }, // 1.0 (1) -> 1.3 / 1.9 ≈ 0.684
+    };
+    const r65 = rank(features65, 0.8);
+    expect(r65.hiddenDangerous.length).toBe(1);
+    expect(thresholdToReveal(r65.hiddenDangerous, 0.8)).toBe(0.65);
+    expect(thresholdToReveal(r65.hiddenDangerous, 0.65)).toBeNull();
+    expect(thresholdToReveal([], 0.8)).toBeNull();
+  });
+
+  it('thresholdToReveal zwraca null, gdy gatunek trujący ma wynik < 50% (suwak nie może go odsłonić)', () => {
+    const featuresLow: FeatureSelections = {
+      volva: { value: 'absent', certainty: 'uncertain' }, // 0.6 (0)
+      hymenophore: { value: 'tubes', certainty: 'uncertain' }, // 0.6 (0)
+      capColor: { value: 'white', certainty: 'uncertain' }, // 0.3 (1) -> 0.3 / 1.5 = 0.2
+    };
+    const r50 = rank(featuresLow, 0.5);
+    expect(r50.dangerous).toEqual([]);
+    expect(ids(r50.hiddenDangerous)).toEqual([mortalis.id]);
+    expect(thresholdToReveal(r50.hiddenDangerous, 0.5)).toBeNull();
+    expect(thresholdToReveal(r50.hiddenDangerous, 0.8)).toBeNull();
+  });
+
+  it('revealHiddenDangerous przenosi wszystkie niewykluczone trujące na widoczną listę niezależnie od progu', () => {
+    const featuresLow: FeatureSelections = {
+      volva: { value: 'absent', certainty: 'uncertain' },
+      hymenophore: { value: 'tubes', certainty: 'uncertain' },
+      capColor: { value: 'white', certainty: 'uncertain' },
+    };
+    const revealed = revealHiddenDangerous(rank(featuresLow, 0.5));
+    expect(ids(revealed.dangerous)).toEqual([mortalis.id]);
+    expect(revealed.hiddenDangerous).toEqual([]);
   });
 });

@@ -63,6 +63,8 @@ export {
   hiddenCount,
   normalizeThreshold,
   rankBySimilarity,
+  revealHiddenDangerous,
+  thresholdToReveal,
   visibleSpecies,
   type SimilarityEntry,
   type SimilarityRanking,

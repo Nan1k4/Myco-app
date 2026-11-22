@@ -18,12 +18,21 @@ export interface AtlasPreset {
 export const MAX_PRESETS = 12;
 export const MAX_PRESET_NAME_LENGTH = 32;
 
+export interface AtlasDirtyFlags {
+  readonly filters: boolean;
+  readonly sort: boolean;
+  readonly presets: boolean;
+}
+
+const NO_DIRTY: AtlasDirtyFlags = { filters: false, sort: false, presets: false };
+
 export interface AtlasState {
   readonly hydrated: boolean;
   readonly filters: AtlasFilters;
   readonly sort: AtlasSort;
   readonly search: string;
   readonly presets: readonly AtlasPreset[];
+  readonly dirty: AtlasDirtyFlags;
 }
 
 export const INITIAL_ATLAS_STATE: AtlasState = {
@@ -32,6 +41,7 @@ export const INITIAL_ATLAS_STATE: AtlasState = {
   sort: 'alpha',
   search: '',
   presets: [],
+  dirty: NO_DIRTY,
 };
 
 export type AtlasAction =
@@ -51,36 +61,64 @@ export type AtlasAction =
 export function atlasReducer(state: AtlasState, action: AtlasAction): AtlasState {
   switch (action.type) {
     case 'hydrate':
-      return { ...state, hydrated: true, filters: action.filters, sort: action.sort, presets: action.presets };
+      return {
+        ...state,
+        hydrated: true,
+        filters: state.dirty.filters ? state.filters : action.filters,
+        sort: state.dirty.sort ? state.sort : action.sort,
+        presets: state.dirty.presets ? state.presets : action.presets,
+        dirty: NO_DIRTY,
+      };
     case 'toggle': {
       const current = state.filters.facets[action.facet] ?? [];
       const next = current.includes(action.value) ? current.filter((v) => v !== action.value) : [...current, action.value];
-      return withFacets(state, setFacet(state.filters.facets, action.facet, next));
+      return withFilters(state, { ...state.filters, facets: setFacet(state.filters.facets, action.facet, next) });
     }
     case 'clear_facet':
-      return withFacets(state, setFacet(state.filters.facets, action.facet, []));
+      return withFilters(state, { ...state.filters, facets: setFacet(state.filters.facets, action.facet, []) });
     case 'set_months':
-      return { ...state, filters: { ...state.filters, months: isWholeYear(action.months) ? null : action.months } };
+      return withFilters(state, { ...state.filters, months: isWholeYear(action.months) ? null : action.months });
     case 'set_in_season_now':
-      return { ...state, filters: { ...state.filters, inSeasonNow: action.value } };
+      return withFilters(state, { ...state.filters, inSeasonNow: action.value });
     case 'clear_all':
-      return { ...state, filters: EMPTY_FILTERS };
+      return withFilters(state, EMPTY_FILTERS);
     case 'set_sort':
-      return { ...state, sort: action.sort };
+      return {
+        ...state,
+        sort: action.sort,
+        dirty: state.hydrated ? state.dirty : { ...state.dirty, sort: true },
+      };
     case 'set_search':
       return { ...state, search: action.search };
     case 'save_preset': {
       if (validatePresetName(action.preset.name, state.presets) !== null) return state;
-      return { ...state, presets: [...state.presets, action.preset] };
+      return {
+        ...state,
+        presets: [...state.presets, action.preset],
+        dirty: state.hydrated ? state.dirty : { ...state.dirty, presets: true },
+      };
     }
     case 'apply_preset': {
       const preset = state.presets.find((p) => p.id === action.id);
-      return preset ? { ...state, filters: preset.filters, sort: preset.sort } : state;
+      if (!preset) return state;
+      return {
+        ...state,
+        filters: preset.filters,
+        sort: preset.sort,
+        dirty: state.hydrated ? state.dirty : { ...state.dirty, filters: true, sort: true },
+      };
     }
-    case 'delete_preset':
-      return { ...state, presets: state.presets.filter((p) => p.id !== action.id) };
+    case 'delete_preset': {
+      const presets = state.presets.filter((p) => p.id !== action.id);
+      if (presets.length === state.presets.length) return state;
+      return {
+        ...state,
+        presets,
+        dirty: state.hydrated ? state.dirty : { ...state.dirty, presets: true },
+      };
+    }
     case 'set_favorable_weather':
-      return { ...state, filters: { ...state.filters, favorableWeather: action.value } };
+      return withFilters(state, { ...state.filters, favorableWeather: action.value });
   }
 }
 
@@ -101,8 +139,12 @@ function isWholeYear(range: MonthRange | null): boolean {
   return range === null || (range.from === 1 && range.to === 12);
 }
 
-function withFacets(state: AtlasState, facets: FacetSelections): AtlasState {
-  return { ...state, filters: { ...state.filters, facets } };
+function withFilters(state: AtlasState, filters: AtlasFilters): AtlasState {
+  return {
+    ...state,
+    filters,
+    dirty: state.hydrated ? state.dirty : { ...state.dirty, filters: true },
+  };
 }
 
 function setFacet(facets: FacetSelections, facet: FacetId, values: readonly string[]): FacetSelections {

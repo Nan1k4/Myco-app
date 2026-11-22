@@ -57,8 +57,8 @@ export const russulaXerampelina: Mushroom = {
   dangerousLookalikes: [
     {
       mushroomId: mushroomId('russula-sardonia'),
-      distinguishingFeatures: ['hymenophoreColor'],
-      note: 'Czerwonofioletowy ma cytrynowożółte blaszki, fioletowy trzon i palący smak.',
+      distinguishingFeatures: ['sporePrint', 'capFleshColorChange', 'bruising'],
+      note: 'Czerwonofioletowy ma kremowy wysyp, niebrązowiejący miąższ, fioletowy trzon i palący smak; śledziowy ma żółty wysyp i brązowiejący po przekrojeniu oraz uciśnięciu miąższ.',
     },
   ],
   legallyProtected: false,

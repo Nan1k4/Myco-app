@@ -63,12 +63,12 @@ export const amanitaFulva: Mushroom = {
   dangerousLookalikes: [
     {
       mushroomId: mushroomId('amanita-phalloides'),
-      distinguishingFeatures: ['capMargin', 'stipeBase', 'ring'],
+      distinguishingFeatures: ['capMargin', 'stipeBase'],
       note: 'Muchomor zielonawy ma gładki brzeg kapelusza, bulwę u podstawy i zwykle pierścień - który może odpaść.',
     },
     {
       mushroomId: mushroomId('amanita-pantherina'),
-      distinguishingFeatures: ['ring', 'stipeBase', 'capSurface'],
+      distinguishingFeatures: ['stipeBase'],
       note: 'Plamisty ma białe łatki na kapeluszu, pierścień i bulwę z obrzeżeniem; rdzawobrązowy - gładki kapelusz, bez pierścienia, z workowatą pochwą bez bulwy.',
     },
   ],

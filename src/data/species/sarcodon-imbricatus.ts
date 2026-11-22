@@ -45,7 +45,7 @@ export const sarcodonImbricatus: Mushroom = {
       youngSpecimensOnly: true,
       notes: 'Tylko młode owocniki; starsze są gorzkie. U części osób niedogotowany może powodować dolegliwości żołądkowe.',
     },
-    notes: 'Jadalny po dokładnej obróbce (obgotowanie lub suszenie łagodzi goryczkę); rzadko spotykany w sprzedaży.',
+    notes: 'Jadalny po dokładnej obróbce (obgotowanie lub suszenie łagodzi goryczkę); rzadko spotykany w sprzedaży. Mylony z niejadalnym, bardzo gorzkim sarniakiem szorstkim (Sarcodon scabrosus) o ciemniejszym, szarozielonkawoczarnym miąższu u podstawy trzonu.',
   },
   ecology: {
     trophicModes: ['mycorrhizal'],
@@ -60,13 +60,7 @@ export const sarcodonImbricatus: Mushroom = {
     lagDays: { min: 7, max: 14 },
     frostSensitive: true,
   },
-  dangerousLookalikes: [
-    {
-      mushroomId: mushroomId('sarcodon-scabrosus'),
-      distinguishingFeatures: ['capSurface', 'stipeShape'],
-      note: 'Sarniak szorstki (niejadalny, bardzo gorzki) ma ciemniejszy, szarozielonkawoczarny miąższ u podstawy trzonu i gorzki smak; sarniak dachówkowaty ma miąższ jasny i smak łagodny lub tylko lekko gorzkawy.',
-    },
-  ],
+  dangerousLookalikes: [],
   legallyProtected: false,
   imageKeys: ['sarcodon-imbricatus-1'],
   description:

@@ -94,6 +94,12 @@ describe('STAGE_SEQUENCE', () => {
     expect(canConfirmIn('latex', 'cut')).toBe(true);
     expect(REVIEW_IN).toEqual({ latex: 'cut', gillAttachment: 'cut' });
     expect(canConfirmIn('volva', 'dig_base')).toBe(true);
+    expect(canConfirmIn('volva', 'dig_base', 'present')).toBe(true);
+    expect(canConfirmIn('volva', 'dig_base', 'absent')).toBe(false); // VALUE_PROCEDURE_OVERRIDES: wymaga też cut
+    expect(canConfirmIn('volva', 'cut', 'absent')).toBe(true);
+    expect(canConfirmIn('hymenophore', 'look', 'gills')).toBe(true);
+    expect(canConfirmIn('hymenophore', 'look', 'gleba')).toBe(false); // VALUE_PROCEDURE_OVERRIDES: wymaga cut
+    expect(canConfirmIn('hymenophore', 'cut', 'gleba')).toBe(true);
     expect(canConfirmIn('capColor', 'look')).toBe(false); // subiektywna - zawsze „na oko”
   });
 
@@ -270,6 +276,33 @@ describe('pomijanie etapów i przenoszenie pytań', () => {
     // Odpowiedź w przekroju (nawet znów „na oko”) kończy sprawę - bez pętli.
     const again = ask([twinB, deadlyFree], selections, { answeredIn: new Map<QuizKey, QuizStage>([['gillAttachment', 'cut']]) });
     expect(again.question?.key).not.toBe('gillAttachment');
+  });
+
+  it('pochwa „brak” w wykopie: confirmStage i reviewableIn przenoszą potwierdzenie do przekroju', () => {
+    const volvaAbsentSafe = testSpecies('Testus nudo', EDIBLE, { volva: ['absent'] });
+    const selections: FilterSelections = {
+      features: { volva: { value: 'absent', certainty: 'uncertain' } },
+    };
+    const answeredIn = new Map<QuizKey, QuizStage>([['volva', 'dig_base']]);
+    expect(reviewableIn('cut', progressOf(selections, { answeredIn }))).toEqual(['volva']);
+    expect(confirmStage('volva', progressOf(selections, { answeredIn }))).toBe('cut');
+    const { question } = ask([volvaAbsentSafe, mortalis], selections, { answeredIn });
+    expect(question).toMatchObject({ kind: 'safety', key: 'volva', stage: 'cut' });
+
+    const confirmed = ask([volvaAbsentSafe, mortalis], selections, { answeredIn: new Map<QuizKey, QuizStage>([['volva', 'cut']]) });
+    expect(confirmed.question?.key).not.toBe('volva');
+  });
+
+  it('hymenofor „gleba” z wyglądu: confirmStage i reviewableIn wymagają przekroju', () => {
+    const puffball = testSpecies('Testus lycoperdon', EDIBLE, { hymenophore: ['gleba'], volva: ['present'] });
+    const selections: FilterSelections = {
+      features: { hymenophore: { value: 'gleba', certainty: 'uncertain' } },
+    };
+    const answeredIn = new Map<QuizKey, QuizStage>([['hymenophore', 'look']]);
+    expect(reviewableIn('cut', progressOf(selections, { answeredIn }))).toEqual(['hymenophore']);
+    expect(confirmStage('hymenophore', progressOf(selections, { answeredIn }))).toBe('cut');
+    const { question } = ask([puffball, mortalis], selections, { answeredIn });
+    expect(question).toMatchObject({ kind: 'safety', key: 'hymenophore', stage: 'cut' });
   });
 
   it('etap otwarty ponownie zawęża, choć quiz poszedł dalej', () => {

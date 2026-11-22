@@ -95,9 +95,14 @@ export function queryAtlas(index: AtlasIndex, { filters, sort, search, currentMo
   return { species: matching.sort(COMPARATORS[sort]), total: index.entries.length, counts, inSeasonNowCount };
 }
 
-export function activeFilterCount(filters: AtlasFilters): number {
+export function activeFilterCount(filters: AtlasFilters, weatherAvailable = true): number {
   const facetCount = FACET_IDS.reduce((sum, id) => sum + (filters.facets[id]?.length ?? 0), 0);
-  return facetCount + (filters.months ? 1 : 0) + (filters.inSeasonNow ? 1 : 0) + (filters.favorableWeather ? 1 : 0);
+  return (
+    facetCount +
+    (filters.months ? 1 : 0) +
+    (filters.inSeasonNow ? 1 : 0) +
+    (filters.favorableWeather && weatherAvailable ? 1 : 0)
+  );
 }
 
 export function activeOptions(index: AtlasIndex, filters: AtlasFilters): readonly { readonly facet: FacetId; readonly option: FacetOption }[] {

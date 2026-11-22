@@ -11,7 +11,7 @@ export const schizophyllumCommune: Mushroom = {
   vernacularNames: [],
   features: {
     hymenophore: ['gills'],
-    gillAttachment: ['not_applicable'],
+    gillAttachment: ['adnate', 'decurrent'],
     capColor: ['grey', 'white', 'cream', 'brown_light'], 
     capShape: ['fan_shaped', 'shelf'],
     capSize: ['under_5'],

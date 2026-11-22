@@ -63,8 +63,8 @@ export const amanitaStrobiliformis: Mushroom = {
   dangerousLookalikes: [
     {
       mushroomId: mushroomId('amanita-echinocephala'),
-      distinguishingFeatures: ['hymenophoreColor'],
-      note: 'Jeżowaty ma ostre, piramidalne brodawki, zielonkawy odcień blaszek i nieprzyjemny zapach. Szyszkowaty - duże, płaskie łaty i frędzlowaty brzeg kapelusza.',
+      distinguishingFeatures: ['capSize', 'ring'],
+      note: 'Jeżowaty ma ostre, piramidalne brodawki, zielonkawy odcień blaszek i nieprzyjemny zapach. Szyszkowaty osiąga większe rozmiary (ponad 20 cm), ma strefowaty lub frędzlowaty pierścień, duże płaskie łaty i frędzlowaty brzeg kapelusza.',
     },
     {
       mushroomId: mushroomId('amanita-virosa'),

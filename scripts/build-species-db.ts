@@ -25,7 +25,7 @@ import {
   buildCreateSchemaSql,
   normalizeSearchText,
 } from '../src/db/schema';
-import { formatMonthRange } from '../src/features/atlas/copy.pl';
+import { formatMonthsLabel } from '../src/features/atlas/copy.pl';
 import { maskOf } from '../src/features/filter/engine/featureBits';
 
 const OUTPUT_DIR = path.resolve(__dirname, '../assets/db');
@@ -46,10 +46,7 @@ function computeMonthsMask(months: readonly Month[]): number {
 }
 
 function buildMonthsLabel(months: NonEmptyArray<Month>): string {
-  const sorted = [...months].sort((a, b) => a - b);
-  const first = sorted[0] ?? months[0];
-  const last = sorted[sorted.length - 1] ?? first;
-  return formatMonthRange(first, last);
+  return formatMonthsLabel(months);
 }
 
 function buildSearchText(species: Mushroom): string {
@@ -67,8 +64,6 @@ function featureMask<K extends FeatureKey>(features: Mushroom['features'], key: 
   return maskOf(key, features[key]);
 }
 
-const STRICT_VALIDATION = process.argv.includes('--strict');
-
 function assertDatabaseValid(): void {
   if (MUSHROOM_DB.dataVersion !== DB_DATA_VERSION) {
     throw new Error(
@@ -80,16 +75,8 @@ function assertDatabaseValid(): void {
   const issues = validateDatabase(MUSHROOM_DB);
   if (issues.length === 0) return;
 
-  const duplicateIds = issues.filter((i) => i.rule === 'duplicate_id');
-  if (duplicateIds.length > 0 || STRICT_VALIDATION) {
-    const report = issues.map((i) => `  - [${i.mushroomId}] ${i.rule}: ${i.detail}`).join('\n');
-    throw new Error(`Walidacja bazy nie powiodła się (${issues.length} błędów):\n${report}`);
-  }
-
-  console.warn(
-    `[build:db] UWAGA: validateDatabase zgłosiło ${issues.length} ostrzeżeń w danych roboczych ` +
-      `(użyj --strict, aby zablokować build). Kontynuuję generowanie ${DB_NAME}...`,
-  );
+  const report = issues.map((i) => `  - [${i.mushroomId}] ${i.rule}: ${i.detail}`).join('\n');
+  throw new Error(`Walidacja bazy nie powiodła się (${issues.length} błędów):\n${report}`);
 }
 
 function main(): void {

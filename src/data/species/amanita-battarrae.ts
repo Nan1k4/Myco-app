@@ -63,8 +63,8 @@ export const amanitaBattarrae: Mushroom = {
   dangerousLookalikes: [
     {
       mushroomId: mushroomId('amanita-phalloides'),
-      distinguishingFeatures: ['ring', 'capMargin'],
-      note: 'Sromotnikowy ma pierścień i gładki, nieprążkowany brzeg kapelusza; oliwkowy - bez pierścienia, brzeg mocno prążkowany. Pierścień sromotnikowego może odpaść!',
+      distinguishingFeatures: ['capMargin', 'stipeBase'],
+      note: 'Sromotnikowy ma pierścień, bulwę u podstawy trzonu i gładki, nieprążkowany brzeg kapelusza; oliwkowy - bez pierścienia i bulwy, brzeg mocno prążkowany. Pierścień sromotnikowego może odpaść!',
     },
   ],
   legallyProtected: false,

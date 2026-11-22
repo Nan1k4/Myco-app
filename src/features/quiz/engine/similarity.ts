@@ -187,6 +187,29 @@ export function hiddenCount(ranking: SimilarityRanking): number {
   return ranking.hiddenHarmlessCount + ranking.hiddenDangerous.length;
 }
 
+/**
+ * Najwyższy próg suwaka (w `[THRESHOLD.min, currentThreshold)`), który odsłoni wszystkie
+ * wpisane gatunki z `entries`. Zwraca `null`, jeśli choć jeden wpis leży poniżej `THRESHOLD.min`
+ * (suwak nie może go odsłonić) albo próg jest już wystarczająco niski.
+ */
+export function thresholdToReveal(entries: readonly SimilarityEntry[], currentThreshold: number): number | null {
+  if (entries.length === 0) return null;
+  const lowest = Math.min(...entries.map((entry) => entry.score));
+  const snapped = Math.round(Math.floor((lowest + EPSILON) / THRESHOLD.step) * THRESHOLD.step * 100) / 100;
+  if (snapped < THRESHOLD.min || snapped >= currentThreshold - EPSILON) return null;
+  return snapped;
+}
+
+/** Przenosi ukryte progiem gatunki niebezpieczne na widoczną listę (niezależnie od `THRESHOLD.min`). */
+export function revealHiddenDangerous(ranking: SimilarityRanking): SimilarityRanking {
+  if (ranking.hiddenDangerous.length === 0) return ranking;
+  return {
+    ...ranking,
+    dangerous: [...ranking.dangerous, ...ranking.hiddenDangerous].sort(byDanger),
+    hiddenDangerous: [],
+  };
+}
+
 function byDanger(a: SimilarityEntry, b: SimilarityEntry): number {
   return byScore(a, b) || Number(b.species.deadly) - Number(a.species.deadly);
 }

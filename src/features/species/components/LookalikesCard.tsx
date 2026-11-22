@@ -34,6 +34,27 @@ export function LookalikesCard({ lookalikes }: LookalikesCardProps) {
       {lookalikes.map((item) => {
         const target = targetsById.get(item.mushroomId);
         const features = item.distinguishingFeatures.map((key) => FEATURE_LABELS_PL[key]).join(' · ');
+        const content = (
+          <>
+            <View style={styles.body}>
+              <View style={styles.nameRow}>
+                <Text style={styles.name}>{target?.polishName ?? item.mushroomId}</Text>
+                {target ? <EdibilityBadge category={target.edibilityCategory} compact /> : null}
+              </View>
+              {item.note ? <Text style={styles.note}>{item.note}</Text> : null}
+              <Text style={styles.features}>Odróżnia: {features}</Text>
+            </View>
+            {target ? <Icon name="chevron-forward" size={16} color={COLORS.dangerText} /> : null}
+          </>
+        );
+
+        if (!target) {
+          return (
+            <View key={item.mushroomId} style={styles.row}>
+              {content}
+            </View>
+          );
+        }
 
         return (
           <PressableScale
@@ -43,15 +64,7 @@ export function LookalikesCard({ lookalikes }: LookalikesCardProps) {
             onPress={() => router.push({ pathname: '/species/[id]', params: { id: item.mushroomId } })}
             style={styles.row}
           >
-            <View style={styles.body}>
-              <View style={styles.nameRow}>
-                <Text style={styles.name}>{target?.polishName ?? item.mushroomId}</Text>
-                {target ? <EdibilityBadge category={target.edibilityCategory} compact /> : null}
-              </View>
-              {item.note ? <Text style={styles.note}>{item.note}</Text> : null}
-              <Text style={styles.features}>Odróżnia: {features}</Text>
-            </View>
-            <Icon name="chevron-forward" size={16} color={COLORS.dangerText} />
+            {content}
           </PressableScale>
         );
       })}

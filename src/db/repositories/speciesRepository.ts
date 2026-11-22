@@ -44,6 +44,17 @@ import type {
 } from '../types';
 
 const MORPHOLOGY_SELECT_SQL = MORPHOLOGY_COLUMNS.map((c) => `s.${c.column}`).join(', ');
+const RING_NONE_BIT = 1 << FEATURE_VOCABULARIES.ring.indexOf('none');
+const LEGAL_VOCABULARY = ['protected', 'unprotected'] as const;
+
+/**
+ * Walidacja wymaga bitu `'none'` u każdego gatunku z pierścieniem (na potrzeby Bramki w Quizie).
+ * W Atlasie opcja `'none'` dotyczy wyłącznie gatunków, które mają samo `'none'` (`m_ring === RING_NONE_BIT`).
+ */
+function atlasRingMask(mask: number): number {
+  const withoutNone = mask & ~RING_NONE_BIT;
+  return withoutNone !== 0 ? withoutNone : mask & RING_NONE_BIT;
+}
 
 /* ------------------------------ Pomocniki bitowe ------------------------------ */
 
@@ -148,7 +159,15 @@ function appendFacetConditions(
       conditions.push(`s.edibility_category IN (${placeholders})`);
       bindParams.push(...selected);
     } else if (id === 'legal') {
-      conditions.push('s.legally_protected = 1');
+      const wantsProtected = selected.includes('protected');
+      const wantsUnprotected = selected.includes('unprotected');
+      if (wantsProtected && !wantsUnprotected) {
+        conditions.push('s.legally_protected = 1');
+      } else if (wantsUnprotected && !wantsProtected) {
+        conditions.push('s.legally_protected = 0');
+      } else if (!wantsProtected && !wantsUnprotected) {
+        conditions.push('1 = 0');
+      }
     } else if (id === 'habitat') {
       conditions.push('(s.habitats_mask & ?) != 0');
       bindParams.push(maskFromVocabulary(HABITATS, selected));
@@ -158,6 +177,20 @@ function appendFacetConditions(
     } else if (id === 'trees') {
       conditions.push('(s.trees_mask IS NOT NULL AND (s.trees_mask & ?) != 0)');
       bindParams.push(maskFromVocabulary(TREE_GENERA, selected));
+    } else if (id === 'ring') {
+      const mask = maskFromVocabulary(FEATURE_VOCABULARIES.ring, selected);
+      const wantsNone = (mask & RING_NONE_BIT) !== 0;
+      const otherMask = mask & ~RING_NONE_BIT;
+      if (wantsNone && otherMask !== 0) {
+        conditions.push('(s.m_ring = ? OR (s.m_ring & ?) != 0)');
+        bindParams.push(RING_NONE_BIT, otherMask);
+      } else if (wantsNone) {
+        conditions.push('s.m_ring = ?');
+        bindParams.push(RING_NONE_BIT);
+      } else {
+        conditions.push('(s.m_ring & ?) != 0');
+        bindParams.push(otherMask);
+      }
     } else {
       const col = MORPHOLOGY_KEY_TO_COLUMN[id];
       conditions.push(`(s.${col} & ?) != 0`);
@@ -242,13 +275,15 @@ function rowFacetMask(row: FacetMaskRow, id: FacetId): number {
     case 'edibility':
       return 1 << row.edibility_rank;
     case 'legal':
-      return row.legally_protected === 1 ? 1 : 0;
+      return row.legally_protected === 1 ? 1 : 2;
     case 'habitat':
       return row.habitats_mask;
     case 'substrate':
       return row.substrates_mask;
     case 'trees':
       return row.trees_mask ?? 0;
+    case 'ring':
+      return atlasRingMask(row.m_ring);
     default:
       return row[MORPHOLOGY_KEY_TO_COLUMN[id]];
   }
@@ -259,7 +294,7 @@ function selectedFacetMask(id: FacetId, selected: readonly string[]): number {
     case 'edibility':
       return maskFromVocabulary(EDIBILITY_CATEGORIES, selected);
     case 'legal':
-      return selected.includes('protected') ? 1 : 0;
+      return maskFromVocabulary(LEGAL_VOCABULARY, selected);
     case 'habitat':
       return maskFromVocabulary(HABITATS, selected);
     case 'substrate':
@@ -276,7 +311,7 @@ function facetVocabulary(id: FacetId): readonly string[] {
     case 'edibility':
       return EDIBILITY_CATEGORIES;
     case 'legal':
-      return ['protected'];
+      return LEGAL_VOCABULARY;
     case 'habitat':
       return HABITATS;
     case 'substrate':
